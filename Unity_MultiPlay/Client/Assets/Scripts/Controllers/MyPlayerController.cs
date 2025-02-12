@@ -18,14 +18,13 @@ public class MyPlayerController : PlayerController
 	protected override void UpdateKeyInput()
 	{
 		base.UpdateKeyInput();
-		var InvenUI = Managers.Inventory.InventoryUI;
-        if (InvenUI == null)
-            return;
-
+		
         if (Input.GetKeyDown(KeyCode.I))
         {
-            InvenUI.ToggleUI();
-        }
+			var InvenUI = Managers.Inventory.InventoryUI;
+			if (InvenUI != null)
+				InvenUI.ToggleUI();
+		}
 	}
 
 	protected override void UpdateController()

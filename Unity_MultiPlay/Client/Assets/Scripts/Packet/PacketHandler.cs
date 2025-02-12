@@ -54,7 +54,7 @@ class PacketHandler
 
         //서버응답은 서버Tick주기가 끝나야만 응답이 오므로 자기플레이어 컨트롤에 대한 응답이 늦다.
         //따라서 MMORPG의경우에 자기 케릭터 클라이언트에서는 서버응답을 받아서 움직이게하지 않는다.
-        if (Managers.Object.MyPlayer.Id == MovePacket.ObjectId)
+        if (Managers.Object.MyPlayer.ObjectId == MovePacket.ObjectId)
             return;
 
         BaseController bc = go.GetComponent<BaseController>();
@@ -151,8 +151,8 @@ class PacketHandler
 	{
 		S_CreatePlayer createPlayerPacket = (S_CreatePlayer)packet;
 
-        if(createPlayerPacket.Player == null)//생성실패시 다시한번 랜덤값으로 시도
-        {
+        if(createPlayerPacket.Player == null)//LoginResultHandler에서 생성실패시 다시한번 랜덤값으로 시도
+		{
 			C_CreatePlayer createPlayerPkt = new C_CreatePlayer();
 			createPlayerPkt.Name = $"Player_{Random.Range(0, 10000).ToString("0000")}";
 			Managers.Network.Send(createPlayerPkt);
@@ -170,18 +170,29 @@ class PacketHandler
         S_ItemInfolist itemList = (S_ItemInfolist)message;
 
         UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
-
         UI_Inventory invenUI = gameSceneUI.InvenUI;
 
         Managers.Inventory.Clear();
 
         foreach(ItemInfo info in itemList.ItemsInfos)
         {
-            Item item = Item.MakeItem(info);
-            Managers.Inventory.Add(item);
+            Item item = Item.CreateItemByItemDb(info);
+            Managers.Inventory.AddItem(item);
         }
 
-        //UI에서 표시
         invenUI.RefreshUI();
+	}
+
+	public static void S_AddItemsHandler(PacketSession session, IMessage message)
+	{
+		S_AddItems s_AddItems = (S_AddItems)message;
+
+        foreach (ItemInfo itemInfo in s_AddItems.ItemsInfos)
+        {
+            Item item = Item.CreateItemByItemDb(itemInfo);
+            Managers.Inventory.AddItem(item);
+            Debug.Log($"아이템 획득 TemplateId: {item.TemplateId}");
+		}
+        Managers.Inventory.InventoryUI.RefreshUI();
 	}
 }

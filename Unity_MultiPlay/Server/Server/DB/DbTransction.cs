@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Google.Protobuf.Protocol;
+using Microsoft.EntityFrameworkCore;
+using Server.Data;
 using Server.DB;
 using Server.GameContents;
 using System;
@@ -53,7 +55,6 @@ namespace Server
 
 		public static async void SaveDBPlayerStatus_Async(Player player, GameRoom room)
 		{
-			//이 함수는 LeaveGame에서 불리고 있으므로, WorkerThread에서 처리중인 함수이다.
 			if (player == null || room == null)
 				return;
 
@@ -81,6 +82,53 @@ namespace Server
 				});
 			}
 			return;
+		}
+
+		public static async void RewardPlayer(Player player, RewardData rewardData, GameRoom room)
+		{
+			if (player == null || rewardData == null || room == null)
+				return;
+
+			int? Slot = player.Inventory.GetEmptySlotNumber();
+			if (Slot == null)
+				return;
+
+			ItemDb itemDb = new ItemDb()
+			{
+				TemplateId = rewardData.ItemId,
+				Count = rewardData.Count,
+				SlotNumber = Slot.Value,
+				OwnerDbId = player.PlayerDbId,
+			};
+
+			bool success = false;
+			Task<bool> task = Task.Run(() => {
+				using (AppDbContext db = new AppDbContext())
+				{
+					db.Items.Add(itemDb);
+					return db.SaveChangesEx();
+				}
+			});
+
+			success = await task;
+			if (success)
+			{
+				room.PushJob(() =>
+				{
+					Console.WriteLine($"Item Added (ItemDbId : {itemDb.ItemDbId})");//여기서는 tracked엔티티다.
+					Item newItem = Item.CreateItemByItemDb(itemDb);
+					player.Inventory.Add(newItem);
+					//Notify to Client 
+					{
+						S_AddItems AddItemsPacket = new S_AddItems();
+						ItemInfo itemInfo = new ItemInfo();
+						itemInfo.MergeFrom(newItem.itemInfo);
+						AddItemsPacket.ItemsInfos.Add(itemInfo);
+
+						player.Session.Send(AddItemsPacket);
+					}
+				});
+			}
 		}
 
 	}

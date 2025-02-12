@@ -9,8 +9,7 @@
         "maxHp": "20",
         "attack": "5",
         "speed": "5.0",
-        "currentExp": "10"
-      },
+        "currentExp": "10"      },
       "Rewards": [
         {
           "Probability": "5",

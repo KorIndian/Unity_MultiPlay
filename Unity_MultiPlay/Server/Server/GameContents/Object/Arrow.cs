@@ -35,7 +35,7 @@ namespace Server.GameContents
                         int Damage = Owner.Stat.Attack + skillData.damage;
                         target.OnDamaged(this, Damage);
                     }
-                    Room.PushJob(Room.LeaveGame, Id);
+                    Room.PushJob(Room.LeaveGame, ObjectId);
                     return;
                 }
             }
@@ -53,7 +53,7 @@ namespace Server.GameContents
             {
                 CellPos = destPos;
                 S_Move movePacket = new S_Move();
-                movePacket.ObjectId = Id;
+                movePacket.ObjectId = ObjectId;
                 movePacket.PosInfo = PosInfo;
                 Room.Broadcast(movePacket);
                 Console.WriteLine("Move Arrow");
@@ -67,8 +67,13 @@ namespace Server.GameContents
                     target.OnDamaged(this, Damage);
                     //TODO 피격판정
                 }
-                Room.PushJob(Room.LeaveGame, Id);
+                Room.PushJob(Room.LeaveGame, ObjectId);
             }
         }
-    }
+
+		public override GameObject GetOwner()
+		{
+			return Owner;
+		}
+	}
 }

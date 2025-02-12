@@ -60,12 +60,12 @@ namespace Server.GameContents
             if (gameObject == null)
                 return;
 
-            GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.Id);
+            GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
 
             if (type == GameObjectType.Player)
             {
                 Player player = gameObject as Player;
-                _players.Add(gameObject.Id, player);
+                _players.Add(gameObject.ObjectId, player);
                 player.Room = this;
                 Map.ApplyMove(player, new Vector2Int(player.PosInfo.PosX, player.PosInfo.PosY));
                 //본인 클라이언트에도 접속되었음을 알림.
@@ -96,7 +96,7 @@ namespace Server.GameContents
             else if (type == GameObjectType.Monster)
             {
                 Monster monster = gameObject as Monster;
-                _monsters.Add(gameObject.Id, monster);
+                _monsters.Add(gameObject.ObjectId, monster);
                 monster.Room = this;
 
                 Map.ApplyMove(monster, new Vector2Int(monster.PosInfo.PosX, monster.PosInfo.PosY));
@@ -104,7 +104,7 @@ namespace Server.GameContents
             else if (type == GameObjectType.Projectile)
             {
                 Projectile projectile = gameObject as Projectile;
-                _projectiles.Add(gameObject.Id, projectile);
+                _projectiles.Add(gameObject.ObjectId, projectile);
                 projectile.Room = this;
             }
 
@@ -115,7 +115,7 @@ namespace Server.GameContents
 
                 foreach (Player p in _players.Values)
                 {
-                    if (p.Id != gameObject.Id)
+                    if (p.ObjectId != gameObject.ObjectId)
                     {
                         p.Session.Send(spawnPacket);
                     }
@@ -169,7 +169,7 @@ namespace Server.GameContents
                 despawnPacket.ObjectIds.Add(objectId);
                 foreach (Player p in _players.Values)
                 {
-                    if (p.Id != objectId)
+                    if (p.ObjectId != objectId)
                     {
                         p.Session.Send(despawnPacket);
                     }

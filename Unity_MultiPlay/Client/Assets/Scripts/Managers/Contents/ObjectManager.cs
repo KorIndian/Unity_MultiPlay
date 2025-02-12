@@ -27,7 +27,7 @@ public class ObjectManager
                 _objects.Add(info.ObjectId, go);//PlayerId는 서버가 발급하게 되어있다.
 
                 MyPlayer = go.GetComponent<MyPlayerController>();
-                MyPlayer.Id = info.ObjectId;
+                MyPlayer.ObjectId = info.ObjectId;
                 MyPlayer.PosInfo = info.PosInfo;
 				MyPlayer.Stat = info.StatInfo;
                 MyPlayer.SyncPos();
@@ -39,7 +39,7 @@ public class ObjectManager
                 _objects.Add(info.ObjectId, go);
 
                 PlayerController pc = go.GetComponent<PlayerController>();
-                pc.Id = info.ObjectId;
+                pc.ObjectId = info.ObjectId;
                 pc.PosInfo = info.PosInfo;
 				pc.Stat = info.StatInfo;
                 pc.SyncPos();
@@ -54,7 +54,7 @@ public class ObjectManager
             _objects.Add(info.ObjectId, go);
 
 			MonsterController mc = go.GetComponent<MonsterController>();
-            mc.Id = info.ObjectId;
+            mc.ObjectId = info.ObjectId;
             mc.PosInfo = info.PosInfo;
             mc.Stat = info.StatInfo;
             mc.SyncPos();

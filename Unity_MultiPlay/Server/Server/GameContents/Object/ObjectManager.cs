@@ -22,13 +22,13 @@ namespace Server.GameContents
             T gameObject = new T();
             lock (_lock)
             {
-                gameObject.Id = GenerateId(gameObject.ObjectType);
+                gameObject.ObjectId = GenerateId(gameObject.ObjectType);
 
-                _gameObjects.Add(gameObject.Id, gameObject);
+                _gameObjects.Add(gameObject.ObjectId, gameObject);
 
                 if (gameObject.ObjectType == GameObjectType.Player)
                 {
-                    _players.Add(gameObject.Id, gameObject as Player);
+                    _players.Add(gameObject.ObjectId, gameObject as Player);
                 }
             }
             return gameObject;

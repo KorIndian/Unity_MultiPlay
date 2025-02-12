@@ -23,18 +23,18 @@ public class InventoryManager
 	
 	private Dictionary<int, Item> items = new Dictionary<int, Item>();
 
-	public void Add(Item item)
+	public void AddItem(Item item)
 	{
 		items.Add(item.itemDbId, item);
 	}
 
-	public Item Get(int itemId)
+	public Item GetItem(int itemId)
 	{
 		items.TryGetValue(itemId, out var item);
 		return item;
 	}
 
-	public Item Find(Func<Item, bool> condition)
+	public Item FindItem(Func<Item, bool> condition)
 	{
 		return items.Values.ToList().Find(item => condition(item));
 	}

@@ -8,7 +8,7 @@ namespace Server.GameContents
     public class GameObject
     {
         public GameObjectType ObjectType { get; protected set; } = GameObjectType.None;
-        public int Id
+        public int ObjectId
         {
             get { return Info.ObjectId; }
             set { Info.ObjectId = value; }
@@ -128,7 +128,7 @@ namespace Server.GameContents
             Stat.Hp = Math.Max(Stat.Hp - damage, 0);
 
             S_ChangeHp hpPacket = new S_ChangeHp();
-            hpPacket.ObjectId = Id;
+            hpPacket.ObjectId = ObjectId;
             hpPacket.Hp = Stat.Hp;
             Room.Broadcast(hpPacket);
 
@@ -145,11 +145,11 @@ namespace Server.GameContents
             State = CreatureState.Dead;
             GameRoom room = Room;
             S_Die diePacket = new S_Die();
-            diePacket.ObjectId = Id;
-            diePacket.AttackerId = attacker.Id;
+            diePacket.ObjectId = ObjectId;
+            diePacket.AttackerId = attacker.ObjectId;
             room.Broadcast(diePacket);
 
-            room.LeaveGame(Id);
+            room.LeaveGame(ObjectId);
 
             //room.PushAfter(() => 
             //{
@@ -161,6 +161,11 @@ namespace Server.GameContents
 
             //    room.EnterGame(this);
             //}, 1000);
+        }
+
+        public virtual GameObject GetOwner()
+        {
+            return this;
         }
     }
 }

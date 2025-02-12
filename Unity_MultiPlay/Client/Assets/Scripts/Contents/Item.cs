@@ -48,7 +48,7 @@ public class Item
 		}
 	}
 
-	public static Item MakeItem(ItemInfo itemInfo)
+	public static Item CreateItemByItemDb(ItemInfo itemInfo)
 	{
 		Item item = null;
 		DataManager.ItemDict.TryGetValue(itemInfo.TemplateId, out var itemData);

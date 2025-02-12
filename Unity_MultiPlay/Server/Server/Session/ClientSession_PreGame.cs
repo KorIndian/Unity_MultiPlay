@@ -76,6 +76,7 @@ namespace Server
 					AccountDbId = newAcc.AccountDbId;
 
 					S_LoginResult loginOk = new S_LoginResult() { LoginResult = 1 };
+					//여기서는 Players목록이 비어서 가기때문에 클라이언트에서 C_CreatePlayer패킷을 보내게 된다.
 					Send(loginOk);
 					//로비로 이동
 					ServerState = PlayerServerState.ServerStateLobby;

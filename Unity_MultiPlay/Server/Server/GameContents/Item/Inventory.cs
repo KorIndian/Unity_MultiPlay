@@ -8,7 +8,8 @@ namespace Server.GameContents
 {
     public class Inventory
     {
-        Dictionary<int, Item> items = new Dictionary<int, Item>();
+		public static int InventoryItemCount { get; private set; } = 54;
+		Dictionary<int, Item> items = new Dictionary<int, Item>();
 
         public void Add(Item item)
         {
@@ -25,5 +26,16 @@ namespace Server.GameContents
         {
             return items.Values.ToList().Find(item => condition(item));
 		}
+
+        public int? GetEmptySlotNumber()
+        {
+            for(int slot =0; slot< InventoryItemCount; slot++)
+            {
+                Item FindItem = items.Values.FirstOrDefault(item => item.SlotNumber == slot);
+                if (FindItem == null)
+                    return slot;
+            }
+            return null;
+        }
     }
 }

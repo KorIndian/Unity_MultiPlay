@@ -7,7 +7,7 @@ using static Define;
 
 public class BaseController : MonoBehaviour
 {
-    public int Id { get; set; }
+    public int ObjectId { get; set; }
 
     StatInfo _stat = new StatInfo();
     public virtual StatInfo Stat

@@ -23,6 +23,7 @@ enum MsgId
 	C_CREATE_PLAYER = 14;
 	S_CREATE_PLAYER = 15;
 	S_ITEM_INFOLIST = 16;
+	S_ADD_ITEMS = 17;
 }
 
 enum CreatureState
@@ -195,5 +196,9 @@ message S_CreatePlayer{
 }
 
 message S_ItemInfolist {
+	repeated ItemInfo itemsInfos = 1;
+}
+
+message S_AddItems {
 	repeated ItemInfo itemsInfos = 1;
 }

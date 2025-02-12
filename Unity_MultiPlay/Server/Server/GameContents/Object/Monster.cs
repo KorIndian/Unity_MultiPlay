@@ -83,13 +83,13 @@ namespace Server.GameContents
 
             if(_target == null || _target.Room == null)
             {
-                Terminate();
+                BeforeTerminate();
                 return;
             }
             int CellDist = Vector2Int.GetCellDist(_target.CellPos, CellPos);
             if(CellDist == 0 || CellDist > _chaseCellDist)
             {
-                Terminate();
+                BeforeTerminate();
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace Server.GameContents
 
             if (path.Count < 2 || path.Count > _chaseCellDist)
             {
-                Terminate();
+                BeforeTerminate();
                 return;
             }
             
@@ -113,11 +113,11 @@ namespace Server.GameContents
             Room.Map.ApplyMove(this, path[1]);
 
             S_Move movePacket = new S_Move();
-            movePacket.ObjectId = Id;
+            movePacket.ObjectId = ObjectId;
             movePacket.PosInfo = PosInfo;
             Room.Broadcast(movePacket);
 
-            void Terminate()
+            void BeforeTerminate()
             {
                 _target = null;
                 State = CreatureState.Idle;
@@ -157,7 +157,7 @@ namespace Server.GameContents
                   _target.OnDamaged(this, skilldata.damage + Stat.Attack);
                 //스킬 사용 Broadcast
                 S_Skill skillPacket = new S_Skill() { Info = new SkillInfo() };
-                skillPacket.ObjectId = Id;
+                skillPacket.ObjectId = ObjectId;
                 skillPacket.Info.SkillId = skilldata.id;
                 Room.Broadcast(skillPacket);
 
@@ -195,7 +195,7 @@ namespace Server.GameContents
         protected void BroadcastMove()
         {
             S_Move movePacket = new S_Move();
-            movePacket.ObjectId = Id;
+            movePacket.ObjectId = ObjectId;
             movePacket.PosInfo = PosInfo;
             Room.Broadcast(movePacket);
         }
@@ -203,14 +203,37 @@ namespace Server.GameContents
         public override void OnDead(GameObject attacker)
         {
             base.OnDead(attacker);
+            //TODO : item generate on db
+
+            GameObject Owner = attacker.GetOwner();
+            if(Owner.ObjectType == GameObjectType.Player)
+            {
+                RewardData rewardData = GetRandomRewarData();
+                if (rewardData != null)
+                {
+                    Player player = (Player)Owner;
+                    DbTransction.RewardPlayer(player, rewardData, player.Room);
+
+                }
+            }
 
         }
 
         public RewardData GetRandomRewarData()
         {
-            RewardData rewardData = new RewardData();
+            DataManager.MonsterDict.TryGetValue(TemplateId, out var MonsterData);
 
-            return rewardData;
+            int RandomNumber = new Random().Next(0, 101);//0~100사이의 랜덤 숫자
+            int SumOfProbability = 0;
+            foreach (RewardData data in MonsterData.Rewards)
+            {
+				SumOfProbability += data.Probability;
+                if(RandomNumber <= SumOfProbability)
+                {
+                    return data;
+                }
+			}
+            return null;
         }
     }
 }

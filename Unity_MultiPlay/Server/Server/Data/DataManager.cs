@@ -26,10 +26,10 @@ namespace Server.Data
         }
 
 		//이 함수는 Common/config.json 에 박혀있는 패스에서 데이터들을 읽어온다. 
-		static Loader LoadCommonJson<Loader, Key, Value>(string fileName) where Loader : ILoader<Key, Value>
+		static LoaderType LoadCommonJson<LoaderType, Key, Value>(string fileName) where LoaderType : ILoader<Key, Value>
         {
-            string text = File.ReadAllText($"{ConfigManager.Config.dataPath}/{fileName}.json");
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Loader>(text);
+            string JsonString = File.ReadAllText($"{ConfigManager.Config.dataPath}/{fileName}.json");
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<LoaderType>(JsonString);
         }
     }
 }
