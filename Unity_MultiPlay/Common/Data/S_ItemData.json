@@ -1,0 +1,44 @@
+{
+  "WeaponInfos": [
+    {
+      "Id": "1",
+      "Name": "견습생의 검",
+      "WeaponType": "Sword",
+      "Damage": "15"
+    },
+    {
+      "Id": "2",
+      "Name": "견습생의 활",
+      "WeaponType": "Bow",
+      "Damage": "10"
+    }
+  ],
+  "ArmorInfos": [
+    {
+      "Id": "100",
+      "Name": "뼈 갑옷",
+      "ArmorType": "Armor",
+      "Defence": "15"
+    },
+    {
+      "Id": "101",
+      "Name": "뼈 투구",
+      "ArmorType": "Helmet",
+      "Defence": "10"
+    }
+  ],
+  "ConsumableInfos": [
+    {
+      "Id": "200",
+      "Name": "HP포션",
+      "ConsumableType": "Potion",
+      "MaxCount": "100"
+    },
+    {
+      "Id": "201",
+      "Name": "MP포션",
+      "ConsumableType": "Potion",
+      "MaxCount": "100"
+    }
+  ]
+}

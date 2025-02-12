@@ -1,0 +1,17 @@
+{
+  "MonsterDatas": [
+    {
+      "id": 1,
+      "name": "DoppleGanger",
+      "prefabPath": "Creature/Monster",
+      "stat": {
+        "level": 1,
+        "hp": 20,
+        "maxHp": 20,
+        "attack": 5,
+        "speed": 5.0,
+        "currentExp": 10
+      }
+    }
+  ]
+}

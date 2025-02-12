@@ -1,0 +1,50 @@
+{
+  "WeaponInfos": [
+    {
+      "Id": "1",
+      "Name": "PrimitiveSword",
+      "WeaponType": "Sword",
+      "Damage": "15",
+      "IconPath": "Textures/WeaponAndTool/Silver Sword"
+    },
+    {
+      "Id": "2",
+      "Name": "PrimitiveBow",
+      "WeaponType": "Bow",
+      "Damage": "10",
+      "IconPath": "Textures/WeaponAndTool/Bow"
+    }
+  ],
+  "ArmorInfos": [
+    {
+      "Id": "100",
+      "Name": "Leather Armor",
+      "ArmorType": "Armor",
+      "Defence": "15",
+      "IconPath": "Textures/Equipment/LeatherArmor"
+    },
+    {
+      "Id": "101",
+      "Name": "Leather Helmet",
+      "ArmorType": "Helmet",
+      "Defence": "10",
+      "IconPath": "Textures/Equipment/LeatherHelmet"
+    }
+  ],
+  "ConsumableInfos": [
+    {
+      "Id": "200",
+      "Name": "HP포션",
+      "ConsumableType": "Potion",
+      "MaxCount": "100",
+      "IconPath": "Textures/Potion/RedPotion"
+    },
+    {
+      "Id": "201",
+      "Name": "MP포션",
+      "ConsumableType": "Potion",
+      "MaxCount": "100",
+      "IconPath": "Textures/Potion/BluePotion"
+    }
+  ]
+}

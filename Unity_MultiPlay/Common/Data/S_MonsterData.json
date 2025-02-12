@@ -1,0 +1,50 @@
+{
+  "MonsterDatas": [
+    {
+      "Id": "1",
+      "Name": "DoppleGanger",
+      "Stat": {
+        "level": "1",
+        "hp": "20",
+        "maxHp": "20",
+        "attack": "5",
+        "speed": "5.0",
+        "currentExp": "10"
+      },
+      "Rewards": [
+        {
+          "Probability": "5",
+          "ItemId": "1",
+          "Count": "1"
+        },
+        {
+          "Probability": "5",
+          "ItemId": "2",
+          "Count": "1"
+        },
+        {
+          "Probability": "5",
+          "ItemId": "100",
+          "Count": "1"
+        },
+        {
+          "Probability": "5",
+          "ItemId": "101",
+          "Count": "1"
+        },
+        {
+          "Probability": "5",
+          "ItemId": "200",
+          "Count": "2"
+        },
+        {
+          "Probability": "5",
+          "ItemId": "201",
+          "Count": "2"
+        }
+      ]
+    }
+    
+
+  ]
+}

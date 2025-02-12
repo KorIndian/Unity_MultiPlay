@@ -1,0 +1,28 @@
+{
+  "statInfos": [
+    {
+      "level": "1",
+      "hp": "200",
+      "maxHp": "200",
+      "attack": "20",
+      "speed": "10.0",
+      "currentExp": "0"
+    },
+    {
+      "level": "2",
+      "hp": "250",
+      "maxHp": "250",
+      "attack": "25",
+      "speed": "10.0",
+      "currentExp": "100"
+    },
+    {
+      "level": "3",
+      "hp": "300",
+      "maxHp": "300",
+      "attack": "30",
+      "speed": "10.0",
+      "currentExp": "200"
+    }
+  ]
+}

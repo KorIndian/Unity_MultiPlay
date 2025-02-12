@@ -1,0 +1,24 @@
+{
+  "skillInfos": [
+    {
+      "id": "1",
+      "name": "pist",
+      "cooldown": "0.5",
+      "damage": "10",
+      "skillType": "SkillAuto"
+    },
+    {
+      "id": "2",
+      "name": "range",
+      "cooldown": "0.5",
+      "damage": "5",
+      "skillType": "SkillProjectile",
+      "projectileInfo": {
+        "name": "arrow",
+        "speed": "10.0",
+        "range": "10",
+        "prefabpath": ""
+      }
+    }
+  ]
+}
