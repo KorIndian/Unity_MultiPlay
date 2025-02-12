@@ -6,7 +6,7 @@ using static Define;
 
 public class ArrowController : BaseController
 {
-	protected override void Init()
+	protected override void StartInit()
 	{
 		switch (Dir)
 		{
@@ -25,7 +25,7 @@ public class ArrowController : BaseController
 		}
 
 		State = CreatureState.Moving;
-		base.Init();
+		base.StartInit();
 	}
 
 	protected override void UpdateAnimation()

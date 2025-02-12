@@ -4,13 +4,13 @@
       "Id": "1",
       "Name": "견습생의 검",
       "WeaponType": "Sword",
-      "Damage": "15"
+      "Damage": "5"
     },
     {
       "Id": "2",
       "Name": "견습생의 활",
       "WeaponType": "Bow",
-      "Damage": "10"
+      "Damage": "3"
     }
   ],
   "ArmorInfos": [
@@ -18,13 +18,13 @@
       "Id": "100",
       "Name": "뼈 갑옷",
       "ArmorType": "Armor",
-      "Defence": "15"
+      "Defence": "5"
     },
     {
       "Id": "101",
       "Name": "뼈 투구",
       "ArmorType": "Helmet",
-      "Defence": "10"
+      "Defence": "5"
     }
   ],
   "ConsumableInfos": [

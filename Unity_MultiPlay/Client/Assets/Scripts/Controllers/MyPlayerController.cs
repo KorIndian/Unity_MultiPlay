@@ -7,13 +7,17 @@ using static Define;
 
 public class MyPlayerController : PlayerController
 {
-    bool _moveKeyPressed = false;
+	public int WeaponDamage { get; private set; } = 0;
+	public int ArmorDefence { get; private set; } = 0;
+
+	bool _moveKeyPressed = false;
     Coroutine _coInputCooltime = null;
 
-    protected override void Init()
+	protected override void StartInit()
     {
-        base.Init();
-    }
+        base.StartInit();
+		ReCalcAdditionalStat();
+	}
 
 	protected override void UpdateKeyInput()
 	{
@@ -156,6 +160,28 @@ public class MyPlayerController : PlayerController
     {
         base.OnDamaged(attacker, damage);
 
-
     }
+
+	public void ReCalcAdditionalStat()
+	{
+		WeaponDamage = 0;
+		ArmorDefence = 0;
+
+		foreach (Item item in Managers.Inventory.Items.Values)
+		{
+			if (item.Equipped == false)
+				continue;
+
+			switch (item.ItemType)
+			{
+				case ItemType.Weapon:
+					WeaponDamage += ((Weapon)item).Damage;
+					break;
+				case ItemType.Armor:
+					ArmorDefence += ((Armor)item).Defence;
+					break;
+			}
+
+		}
+	}
 }

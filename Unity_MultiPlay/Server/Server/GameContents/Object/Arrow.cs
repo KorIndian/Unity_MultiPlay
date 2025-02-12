@@ -10,21 +10,18 @@ namespace Server.GameContents
     {
         public GameObject Owner { get; set; }
 
-        long _nextMoveTick = 0;
-        long _PreTick = 0;
-        long _DeltaTick = 0;
         public override void Update()
         {
-            _DeltaTick = Environment.TickCount64 - _PreTick;
-            //Console.WriteLine($"{Environment.TickCount64}, {_PreTick}, {_DeltaTick}");
-            _PreTick = Environment.TickCount64;
-            
-            Vector2Int destPos = GetFrontCellPos();
-            if (Owner == null || Room == null)
-                return;
-            if (skillData == null || skillData.projectileInfo ==null)
-                return;
+			if (Owner == null || Room == null)
+				return;
 
+			if (skillData == null || skillData.projectileInfo == null)
+				return;
+
+			int tick = (int)(1000 / skillData.projectileInfo.speed);//e.g (1000/5)ms -> 0.2초에 한번씩 업데이트를 예약한다.
+			Room.PushAfter(Update, tick);
+			Vector2Int destPos = GetFrontCellPos();
+            
             if (CellPos != Owner.CellPos)
             {
                 if (!Room.Map.CanGo(destPos) || !Room.Map.CanGo(CellPos))
@@ -32,22 +29,14 @@ namespace Server.GameContents
                     GameObject target = Room.Map.Find(destPos);
                     if (target != null)
                     {
-                        int Damage = Owner.Stat.Attack + skillData.damage;
+                        int Damage = Owner.TotalAttack + skillData.damage;
                         target.OnDamaged(this, Damage);
                     }
                     Room.PushJob(Room.LeaveGame, ObjectId);
                     return;
                 }
             }
-            if (_nextMoveTick >= Environment.TickCount64)
-            {
-                return;
-            }
-                
-
-            long tick = (long)(1000 / skillData.projectileInfo.speed);
-            _nextMoveTick = Environment.TickCount64 + tick;
-
+            
             //TODO 화살 콜리전 체크 더 자주 하도록 해야함.(삑사리)
             if (Room.Map.CanGo(destPos))
             {
@@ -63,13 +52,14 @@ namespace Server.GameContents
                 GameObject target = Room.Map.Find(destPos);
                 if (target != null)
                 {
-                    int Damage = Owner.Stat.Attack + skillData.damage;
+                    int Damage = Owner.TotalAttack + skillData.damage;
                     target.OnDamaged(this, Damage);
                     //TODO 피격판정
                 }
                 Room.PushJob(Room.LeaveGame, ObjectId);
             }
-        }
+			
+		}
 
 		public override GameObject GetOwner()
 		{

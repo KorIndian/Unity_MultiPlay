@@ -108,16 +108,6 @@ namespace Server
 
 				using (AppDbContext db = new AppDbContext())
 				{
-					//Test Code
-					//ItemDb item1 = new ItemDb();
-					//item1.Count = 1;
-					//item1.OwnerDbId = PlayerInfo.PlayerDbId;
-					//item1.TemplateId = 100;
-					//item1.SlotNumber = 1;
-
-					//db.Items.Add(item1);
-					//db.SaveChangesEx();
-
 					List<ItemDb> itemDbDatas = db.Items
 										.Where(i => i.OwnerDbId == PlayerInfo.PlayerDbId)
 										.ToList();
@@ -128,7 +118,7 @@ namespace Server
 						Item item = Item.CreateItemByItemDb(itemDb);
 						if (item != null)
 						{
-							MyPlayer.Inventory.Add(item);
+							MyPlayer.Inventory.AddItem(item);
 							ItemInfo info = new ItemInfo();
 							info.MergeFrom(item.itemInfo);
 							itemListPacket.ItemsInfos.Add(info);

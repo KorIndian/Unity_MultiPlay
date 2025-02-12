@@ -36,6 +36,12 @@ public class Item
 		set => itemInfo.SlotNumber = value;
 	}
 
+	public bool Equipped
+	{
+		get => itemInfo.Equipped;
+		set => itemInfo.Equipped = value;
+	}
+
 	public ItemType ItemType { get; private set; }
 	public bool Stackable { get; protected set; }
 
@@ -72,6 +78,7 @@ public class Item
 			item.itemDbId = itemInfo.ItemDbId;
 			item.Count = itemInfo.Count;
 			item.SlotNumber = itemInfo.SlotNumber;
+			item.Equipped = itemInfo.Equipped;
 		}
 
 		return item;

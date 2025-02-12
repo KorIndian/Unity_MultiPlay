@@ -31,7 +31,8 @@ public class ObjectManager
                 MyPlayer.PosInfo = info.PosInfo;
 				MyPlayer.Stat = info.StatInfo;
                 MyPlayer.SyncPos();
-            }
+				
+			}
             else//다른 유저플레이어를 소환해야하는 경우.
             {
                 GameObject go = Managers.Resource.Instantiate("Creature/Player");

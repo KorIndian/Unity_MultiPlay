@@ -10,9 +10,9 @@ public class PlayerController : CreatureController
     protected Coroutine _coSkill;
     protected bool _rangedSkill = false;
 
-    protected override void Init()
+    protected override void StartInit()
     {
-        base.Init();
+        base.StartInit();
     }
 
     protected override void UpdateAnimation()

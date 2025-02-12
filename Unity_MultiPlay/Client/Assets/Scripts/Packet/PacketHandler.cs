@@ -169,9 +169,6 @@ class PacketHandler
 	{
         S_ItemInfolist itemList = (S_ItemInfolist)message;
 
-        UI_GameScene gameSceneUI = Managers.UI.SceneUI as UI_GameScene;
-        UI_Inventory invenUI = gameSceneUI.InvenUI;
-
         Managers.Inventory.Clear();
 
         foreach(ItemInfo info in itemList.ItemsInfos)
@@ -180,19 +177,41 @@ class PacketHandler
             Managers.Inventory.AddItem(item);
         }
 
-        invenUI.RefreshUI();
+        if(Managers.Object.MyPlayer != null)
+			Managers.Object.MyPlayer.ReCalcAdditionalStat();
+
+		Managers.Inventory.InventoryUI.RefreshUI();
 	}
 
 	public static void S_AddItemsHandler(PacketSession session, IMessage message)
 	{
-		S_AddItems s_AddItems = (S_AddItems)message;
+		S_AddItems AddItems = (S_AddItems)message;
 
-        foreach (ItemInfo itemInfo in s_AddItems.ItemsInfos)
+        foreach (ItemInfo itemInfo in AddItems.ItemsInfos)
         {
             Item item = Item.CreateItemByItemDb(itemInfo);
             Managers.Inventory.AddItem(item);
             Debug.Log($"아이템 획득 TemplateId: {item.TemplateId}");
 		}
-        Managers.Inventory.InventoryUI.RefreshUI();
+		Managers.Object.MyPlayer.ReCalcAdditionalStat();
+		Managers.Inventory.InventoryUI.RefreshUI();
+	}
+
+	public static void S_EquipItemHandler(PacketSession session, IMessage message)
+	{
+		S_EquipItem equipItem = (S_EquipItem)message;
+        Item item = Managers.Inventory.GetItem(equipItem.ItemDbId);
+        if (item == null)
+            return;
+
+		item.Equipped = equipItem.Equipped;
+        Debug.Log($"아이템 착용 변경 Id: {equipItem.ItemDbId} Equipped: {item.Equipped}");
+		Managers.Object.MyPlayer.ReCalcAdditionalStat();
+		Managers.Inventory.InventoryUI.RefreshUI();
+	}
+
+	public static void S_ChangeStatHandler(PacketSession session, IMessage message)
+	{
+		S_ChangeStat ChangeStat = (S_ChangeStat)message;
 	}
 }

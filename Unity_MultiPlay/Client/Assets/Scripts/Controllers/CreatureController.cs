@@ -49,9 +49,9 @@ public class CreatureController : BaseController
 		UpdateKeyInput();
 	}
 
-	protected override void Init()
+	protected override void StartInit()
 	{
-		base.Init();
+		base.StartInit();
 		AddHpBar();
     }
 

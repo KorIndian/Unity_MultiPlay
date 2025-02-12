@@ -154,7 +154,7 @@ namespace Server.GameContents
                 //데미지 적용
                 SkillData skilldata = null;
                 DataManager.SkillDict.TryGetValue(1, out skilldata);
-                  _target.OnDamaged(this, skilldata.damage + Stat.Attack);
+                  _target.OnDamaged(this, skilldata.damage + TotalAttack);
                 //스킬 사용 Broadcast
                 S_Skill skillPacket = new S_Skill() { Info = new SkillInfo() };
                 skillPacket.ObjectId = ObjectId;
@@ -175,7 +175,6 @@ namespace Server.GameContents
             
         }
 
-        
         protected virtual bool SkillRangeCheck()
         {
             if (_target != null)
@@ -212,7 +211,7 @@ namespace Server.GameContents
                 if (rewardData != null)
                 {
                     Player player = (Player)Owner;
-                    DbTransction.RewardPlayer(player, rewardData, player.Room);
+                    DbTransaction.RewardPlayer(player, rewardData, player.Room);
 
                 }
             }

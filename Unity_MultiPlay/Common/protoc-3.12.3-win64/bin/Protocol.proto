@@ -24,6 +24,9 @@ enum MsgId
 	S_CREATE_PLAYER = 15;
 	S_ITEM_INFOLIST = 16;
 	S_ADD_ITEMS = 17;
+	C_EQUIP_ITEM = 18;
+	S_EQUIP_ITEM = 19;
+	S_CHANGE_STAT = 20;
 }
 
 enum CreatureState
@@ -123,6 +126,7 @@ message ItemInfo
 	int32 templateId = 2;
 	int32 count = 3;
 	int32 slotNumber = 4;
+	bool equipped = 5;
 }
 message C_EnterGame{
 	string name = 1;
@@ -201,4 +205,18 @@ message S_ItemInfolist {
 
 message S_AddItems {
 	repeated ItemInfo itemsInfos = 1;
+}
+
+message C_EquipItem {
+	int32 itemDbId = 1;
+	bool equipped = 2;
+}
+
+message S_EquipItem {
+	int32 itemDbId = 1;
+	bool equipped = 2;
+}
+
+message S_ChangeStat {
+	StatInfo statinfo = 1;
 }

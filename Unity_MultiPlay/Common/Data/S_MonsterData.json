@@ -5,9 +5,9 @@
       "Name": "DoppleGanger",
       "Stat": {
         "level": "1",
-        "hp": "20",
-        "maxHp": "20",
-        "attack": "5",
+        "hp": "40",
+        "maxHp": "40",
+        "attack": "10",
         "speed": "5.0",
         "currentExp": "10"      },
       "Rewards": [

@@ -25,6 +25,9 @@ namespace Server.GameContents
         public PositionInfo PosInfo { get; private set; } = new PositionInfo();
         public StatInfo Stat { get; private set; } = new StatInfo();
 
+        public virtual int TotalAttack { get => Stat.Attack; }
+        public virtual int TotalDefence { get => 0; }
+
         public int Hp
         {
             get { return Stat.Hp; }
@@ -125,8 +128,11 @@ namespace Server.GameContents
         {
             if (Room == null)
                 return;
-            Stat.Hp = Math.Max(Stat.Hp - damage, 0);
 
+            damage = Math.Max(damage - TotalDefence, 0);
+			Console.WriteLine($"Damage : {damage} HP: {Stat.Hp}");
+
+			Stat.Hp = Math.Max(Stat.Hp - damage, 0);
             S_ChangeHp hpPacket = new S_ChangeHp();
             hpPacket.ObjectId = ObjectId;
             hpPacket.Hp = Stat.Hp;

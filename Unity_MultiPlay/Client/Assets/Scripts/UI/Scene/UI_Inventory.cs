@@ -50,7 +50,7 @@ public class UI_Inventory : UI_Scene
 			if (item.SlotNumber < 0 || item.SlotNumber > InventoryItemCount)
 				return;
 
-			ItemUIs[item.SlotNumber].SetItem(item.TemplateId, item.Count);
+			ItemUIs[item.SlotNumber].SetItem(item);
 			ItemUIs[item.SlotNumber].gameObject.SetActive(true);
 		});
 

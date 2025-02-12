@@ -231,7 +231,7 @@ public class BaseController : MonoBehaviour
 
     void Start()
     {
-        Init();
+        StartInit();
     }
 
     void Update()
@@ -239,7 +239,7 @@ public class BaseController : MonoBehaviour
         UpdateController();
     }
 
-    protected virtual void Init()
+    protected virtual void StartInit()
     {
         _animator = GetComponent<Animator>();
         _sprite = GetComponent<SpriteRenderer>();

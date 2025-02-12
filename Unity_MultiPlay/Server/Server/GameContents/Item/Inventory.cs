@@ -9,29 +9,29 @@ namespace Server.GameContents
     public class Inventory
     {
 		public static int InventoryItemCount { get; private set; } = 54;
-		Dictionary<int, Item> items = new Dictionary<int, Item>();
+		public Dictionary<int, Item> Items = new Dictionary<int, Item>();
 
-        public void Add(Item item)
+        public void AddItem(Item item)
         {
-            items.Add(item.itemDbId, item);
+            Items.Add(item.itemDbId, item);
 		}
 
-        public Item Get(int itemId)
+        public Item GetItem(int itemId)
         {
-			items.TryGetValue(itemId, out var item);
+			Items.TryGetValue(itemId, out var item);
             return item;
 		}
 
-        public Item Find(Func<Item, bool> condition)
+        public Item FindItem(Func<Item, bool> condition)
         {
-            return items.Values.ToList().Find(item => condition(item));
+            return Items.Values.ToList().Find(item => condition(item));
 		}
 
         public int? GetEmptySlotNumber()
         {
             for(int slot =0; slot< InventoryItemCount; slot++)
             {
-                Item FindItem = items.Values.FirstOrDefault(item => item.SlotNumber == slot);
+                Item FindItem = Items.Values.FirstOrDefault(item => item.SlotNumber == slot);
                 if (FindItem == null)
                     return slot;
             }
