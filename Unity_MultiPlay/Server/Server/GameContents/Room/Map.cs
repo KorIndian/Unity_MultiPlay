@@ -271,7 +271,7 @@ namespace Server.GameContents
 
 			while (pq.Count > 0)
 			{
-				// 제일 좋은 후보를 찾는다
+				// 제일 좋은 후보를 찾는다(이미 F값에대한 우선순위큐로 구현되어 있기때문에 pop하는 것으로 끝난다.)
 				PQNode PQnode = pq.Pop();
 				Pos currentPos = new Pos(PQnode.Y, PQnode.X);
 				// 동일한 좌표를 여러 경로로 찾아서, 더 빠른 경로로 인해서 이미 방문(closed)된 경우 스킵
