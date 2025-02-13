@@ -156,17 +156,6 @@ namespace Server.GameContents
             room.Broadcast(diePacket);
 
             room.LeaveGame(ObjectId);
-
-            //room.PushAfter(() => 
-            //{
-            //    Stat.Hp = Stat.MaxHp;
-            //    PosInfo.State = CreatureState.Idle;
-            //    PosInfo.MoveDir = MoveDir.Down;
-            //    PosInfo.PosX = 0;
-            //    PosInfo.PosY = 0;
-
-            //    room.EnterGame(this);
-            //}, 1000);
         }
 
         public virtual GameObject GetOwner()

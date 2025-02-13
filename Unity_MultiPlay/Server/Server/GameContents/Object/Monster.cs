@@ -20,7 +20,9 @@ namespace Server.GameContents
         int _chaseCellDist = 15;
         long _coolTime = 0;
 
-        public Monster()
+		private IJob _updateJob;
+
+		public Monster()
         {
             ObjectType = GameObjectType.Monster;
         }
@@ -53,6 +55,9 @@ namespace Server.GameContents
                     UpdateDead();
                     break;
             }
+
+            if (Room != null)
+				_updateJob = Room.PushAfter(Update, 200);
         }
         
         protected virtual void UpdateIdle()
@@ -201,9 +206,14 @@ namespace Server.GameContents
 
         public override void OnDead(GameObject attacker)
         {
-            base.OnDead(attacker);
-            //TODO : item generate on db
+			if (_updateJob != null)
+			{
+				_updateJob.Cancel = true;
+				_updateJob = null;
+			}
 
+			base.OnDead(attacker);
+            
             GameObject Owner = attacker.GetOwner();
             if(Owner.ObjectType == GameObjectType.Player)
             {
@@ -215,7 +225,6 @@ namespace Server.GameContents
 
                 }
             }
-
         }
 
         public RewardData GetRandomRewarData()

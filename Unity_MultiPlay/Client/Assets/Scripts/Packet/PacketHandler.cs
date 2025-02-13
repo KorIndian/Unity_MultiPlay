@@ -179,8 +179,8 @@ class PacketHandler
 
         if(Managers.Object.MyPlayer != null)
 			Managers.Object.MyPlayer.ReCalcAdditionalStat();
-
 		Managers.Inventory.InventoryUI.RefreshUI();
+
 	}
 
 	public static void S_AddItemsHandler(PacketSession session, IMessage message)
@@ -208,6 +208,10 @@ class PacketHandler
         Debug.Log($"아이템 착용 변경 Id: {equipItem.ItemDbId} Equipped: {item.Equipped}");
 		Managers.Object.MyPlayer.ReCalcAdditionalStat();
 		Managers.Inventory.InventoryUI.RefreshUI();
+
+		var GameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+		if (GameSceneUI != null)
+			GameSceneUI.StatUI.RefreshUI();
 	}
 
 	public static void S_ChangeStatHandler(PacketSession session, IMessage message)

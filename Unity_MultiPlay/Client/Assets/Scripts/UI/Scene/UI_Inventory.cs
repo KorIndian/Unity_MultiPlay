@@ -12,7 +12,7 @@ public class UI_Inventory : UI_Scene
 
 	public bool IsInit { get; private set; } = false;
 
-	public override void Init()
+	public override void AwakeInit()
 	{
 		if (IsInit)
 			return;
@@ -41,7 +41,7 @@ public class UI_Inventory : UI_Scene
 	public void RefreshUI()
 	{
 		if (IsInit == false)
-			Init();
+			AwakeInit();
 
 		var itemlist = Managers.Inventory.Items.Values.ToList();
 		//itemlist.Sort((left, right) => left.SlotNumber - right.SlotNumber);
@@ -56,12 +56,12 @@ public class UI_Inventory : UI_Scene
 
 	}
 
-	public override void ToggleUI()
-	{
-		if(gameObject.activeSelf)
-			gameObject.SetActive(false);
-		else 
-			gameObject.SetActive(true);
-	}
+	//public override void ToggleUI()
+	//{
+	//	if(gameObject.activeSelf)
+	//		gameObject.SetActive(false);
+	//	else 
+	//		gameObject.SetActive(true);
+	//}
 
 }

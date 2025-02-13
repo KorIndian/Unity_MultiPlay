@@ -30,30 +30,31 @@ namespace Server
             PushJob(new Job<T1, T2, T3>(action, t1, t2 ,t3));
         }
 
-        public void PushAfter(Action action, int TickAfter)
+        public IJob PushAfter(Action action, int TickAfter)
         {
-            PushAfter(new Job(action), TickAfter);
+            return PushAfter(new Job(action), TickAfter);
         }
 
-        public void PushAfter<T1>(Action<T1> action, T1 t1, int TickAfter)
+        public IJob PushAfter<T1>(Action<T1> action, T1 t1, int TickAfter)
         {
-            PushAfter(new Job<T1>(action, t1), TickAfter);
+			return PushAfter(new Job<T1>(action, t1), TickAfter);
         }
 
-        public void PushAfter<T1, T2>(Action<T1, T2> action, T1 t1, T2 t2, int TickAfter)
+        public IJob PushAfter<T1, T2>(Action<T1, T2> action, T1 t1, T2 t2, int TickAfter)
         {
-            PushAfter(new Job<T1, T2>(action, t1, t2), TickAfter);
+			return PushAfter(new Job<T1, T2>(action, t1, t2), TickAfter);
         }
 
-        public void PushAfter<T1, T2, T3>(Action<T1, T2, T3> action, T1 t1, T2 t2, T3 t3, int TickAfter)
+        public IJob PushAfter<T1, T2, T3>(Action<T1, T2, T3> action, T1 t1, T2 t2, T3 t3, int TickAfter)
         {
-            PushAfter(new Job<T1, T2, T3>(action, t1, t2, t3), TickAfter);
+			return PushAfter(new Job<T1, T2, T3>(action, t1, t2, t3), TickAfter);
         }
 
-        public void PushAfter(IJob job, int TickAfter)
+        public IJob PushAfter(IJob job, int TickAfter)
         {
-            _timer.Push(job, TickAfter);
-        }
+			_timer.Push(job, TickAfter);
+            return job;
+		}
 
         public void PushJob(IJob job)
         {

@@ -31,10 +31,10 @@ public partial class GameRoom : JobSerializer
 
 	public void Update(long TickInterval)
 	{
-		foreach (Monster monster in _monsters.Values)
-		{
-			monster.Update();
-		}
+		//foreach (Monster monster in _monsters.Values)
+		//{
+		//	monster.Update();
+		//}
 		Flush();
 
 		if (_monsters.Values.Count == 0 && !bRespawning)
@@ -99,6 +99,7 @@ public partial class GameRoom : JobSerializer
 			monster.Room = this;
 
 			Map.ApplyMove(monster, new Vector2Int(monster.PosInfo.PosX, monster.PosInfo.PosY));
+			monster.Update();
 		}
 		else if (type == GameObjectType.Projectile)
 		{

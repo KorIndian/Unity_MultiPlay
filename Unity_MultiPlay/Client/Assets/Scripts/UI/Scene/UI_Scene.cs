@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UI_Scene : UI_Base
 {
-	public override void Init()
+	public override void AwakeInit()
 	{
 		Managers.UI.SetCanvas(gameObject, false);
 		//SetCanvas함수 내부에서 SortOrder를 명시적으로 Init이 불려진 순서대로
@@ -15,7 +15,10 @@ public class UI_Scene : UI_Base
 
 	public virtual void ToggleUI()
 	{
-
+		if (gameObject.activeSelf)
+			gameObject.SetActive(false);
+		else
+			gameObject.SetActive(true);
 	}
 
 }

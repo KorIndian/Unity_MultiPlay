@@ -9,17 +9,24 @@ public class CreatureController : BaseController
 {
 	HpBar _hpBar;
 
-	StatInfo _stat = new StatInfo();
 	public override StatInfo Stat
     {
 		get { return base.Stat; }
-        set{ base.Stat = value; UpdateHpBar(); }
+        set
+		{
+			base.Stat = value; 
+			UpdateHpBar();
+		}
     }
 
 	public override int Hp
     {
 		get { return Stat.Hp; }
-		set { base.Hp = value; UpdateHpBar(); }
+		set 
+		{ 
+			base.Hp = value; 
+			UpdateHpBar(); 
+		}
     }
 
 	protected void AddHpBar()

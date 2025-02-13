@@ -8,11 +8,11 @@ using UnityEngine.UI;
 public abstract class UI_Base : MonoBehaviour
 {
 	protected Dictionary<Type, UnityEngine.Object[]> _objects = new Dictionary<Type, UnityEngine.Object[]>();
-	public abstract void Init();
+	public abstract void AwakeInit();
 
 	private void Awake()
 	{
-		Init();
+		AwakeInit();
 	}
 
 	protected void Bind<T>(Type type) where T : UnityEngine.Object

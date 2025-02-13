@@ -25,6 +25,8 @@ public partial class DbTransaction
 		};
 
 		bool success = false;
+		//만약 순서가 중요하다면 JobSerializer에 push하는 방식으로 만들어야겠지만,
+		//순서가 딱히 중요하지 않으므로 Task로 만들어 쓰레드를 최대로 활용한다.
 		Task<bool> task = Task.Run(() => {
 			using (AppDbContext db = new AppDbContext())
 			{
@@ -34,7 +36,8 @@ public partial class DbTransaction
 				return db.SaveChangesEx();
 			}
 		});
-
+		//만약에 거래같은 중요한 데이터 트랜잭션의 경우 Task안에 할것들을 몰아넣고 마지막에 SaveChanges를 한번만 호출하며
+		//결과가 true이면 client노티를 하는 방식으로 짜면 원자성을 보장할 수 있다.
 		success = await task;
 		if (success)
 		{

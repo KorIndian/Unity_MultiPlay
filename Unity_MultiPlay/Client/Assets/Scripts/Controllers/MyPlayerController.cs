@@ -7,6 +7,8 @@ using static Define;
 
 public class MyPlayerController : PlayerController
 {
+    public int TotalDamage => Stat.Attack + WeaponDamage;
+
 	public int WeaponDamage { get; private set; } = 0;
 	public int ArmorDefence { get; private set; } = 0;
 
@@ -28,6 +30,14 @@ public class MyPlayerController : PlayerController
 			var InvenUI = Managers.Inventory.InventoryUI;
 			if (InvenUI != null)
 				InvenUI.ToggleUI();
+		}
+
+		if (Input.GetKeyDown(KeyCode.C))
+		{
+            var GameSceneUI = Managers.UI.SceneUI as UI_GameScene;
+            if(GameSceneUI != null)
+                GameSceneUI.StatUI.ToggleUI();
+			
 		}
 	}
 

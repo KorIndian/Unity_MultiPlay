@@ -24,12 +24,14 @@ public class UI_Inventory_Item : UI_Base
 	public bool? Equipped => refItem?.Equipped;
 	
 
-	public override void Init()
+	public override void AwakeInit()
 	{
 		itemIcon.gameObject.BindEvent(e =>
 		{
-			Debug.Log("Click Item");
+			if (refItem == null)
+				return;
 
+			Debug.Log("Click Item");
 			if (refItem.ItemType == ItemType.Consumable || refItem.ItemType == ItemType.None)
 				return;
 
@@ -46,6 +48,14 @@ public class UI_Inventory_Item : UI_Base
 
 	public void SetItem(Item _item)
     {
+		if (_item == null)
+		{
+			refItem = null;
+			itemIcon.gameObject.SetActive(false);
+			itemFrame.gameObject.SetActive(false);
+			return;
+		}
+			
 		refItem = _item;
 		DataManager.ItemDict.TryGetValue(refItem.TemplateId, out var itemData);
 		if (itemData != null)

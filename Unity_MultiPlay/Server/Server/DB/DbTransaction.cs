@@ -29,9 +29,9 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 		playerDb.PlayerDbId = player.PlayerDbId;//Id만 연결해주면, 수정될 row에 업데이트쿼리만 부를 수 있으면 되므로.
 		playerDb.Hp = player.Hp;
 
-		//db접근은 시간이 오래걸리므로 job을 푸쉬에서 다른 쓰레드로 일감을 던진다 
-		//아래의 람다는 메인쓰레드에서 처리될 예정이다. 
-		Instance.PushJob(() => 
+		//여기까지는 호출쓰레드
+
+		Instance.PushJob(() =>//Db쓰레드에서 플러쉬 될때 실행.
 		{
 			using (AppDbContext db = new AppDbContext())
 			{
@@ -40,13 +40,11 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 				bool success = db.SaveChangesEx();
 				if (success)
 				{
-					//GameRoom은 timer쓰레드에서 update를 호출하고 update가 50ms마다 flush하고있다.
-					room.PushJob(() =>
+					room.PushJob(() =>//room에다 push한람다는 room 쓰레드에서 실행된다. 
 					{
-                            Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
-                        });
+						Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
+					});
 				}
-				else return;
 			}
 		});
 		//job만 push하고 바로 리턴을 때린다.
@@ -63,7 +61,8 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 		playerDb.PlayerDbId = player.PlayerDbId;//Id만 연결해주면, 수정될 row에 업데이트쿼리만 부를 수 있으면 되므로.
 		playerDb.Hp = player.Hp;
 		bool success = false;
-		Task<bool> task = Task.Run(() => {
+		Task<bool> task = Task.Run(() =>
+		{
 			using (AppDbContext db = new AppDbContext())
 			{
 				db.Entry(playerDb).State = EntityState.Unchanged;
@@ -104,7 +103,8 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 		};
 		//1.DB에 먼저 저장요청
 		bool success = false;
-		Task<bool> task = Task.Run(() => {
+		Task<bool> task = Task.Run(() =>
+		{
 			using (AppDbContext db = new AppDbContext())
 			{
 				db.Items.Add(itemDb);
