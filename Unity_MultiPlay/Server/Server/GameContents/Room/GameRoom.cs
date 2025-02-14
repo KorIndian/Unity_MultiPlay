@@ -139,13 +139,6 @@ public partial class GameRoom : JobSerializer
 			S_Spawn spawnPacket = new S_Spawn();
 			spawnPacket.ObjectInfos.Add(gameObject.Info);
 
-			//foreach (Player p in _players.Values)
-			//{
-			//	if (p.ObjectId != gameObject.ObjectId)
-			//	{
-			//		p.Session.Send(spawnPacket);
-			//	}
-			//}
 			BroadcastVisionBound(gameObject.CellPos, spawnPacket);
 		}
 	}
@@ -198,13 +191,7 @@ public partial class GameRoom : JobSerializer
 		{
 			S_Despawn despawnPacket = new S_Despawn();
 			despawnPacket.ObjectIds.Add(objectId);
-			//foreach (Player p in _players.Values)
-			//{
-			//	if (p.ObjectId != objectId)
-			//	{
-			//		p.Session.Send(despawnPacket);
-			//	}
-			//}
+			
 			var FindObject = ObjectManager.Instance.Find<GameObject>(objectId);
 			BroadcastVisionBound(FindObject.CellPos, despawnPacket);
 		}
@@ -258,7 +245,7 @@ public partial class GameRoom : JobSerializer
 	public List<Zone> GetAdjecentZones(Vector2Int cellPos, int bounds = VisionBounds)
 	{
 		List<Zone> zones = new List<Zone>();
-		int[] delta = new int[3] { -bounds, 0, +bounds };
+		int[] delta = new int[3] { -bounds, 0,+bounds };
 		foreach (int dy in delta)
 		{
 			foreach (int dx in delta)
@@ -266,7 +253,7 @@ public partial class GameRoom : JobSerializer
 				int Y = cellPos.y + dy;
 				int X = cellPos.x + dx;
 				Zone zone = GetZone(new Vector2Int(X, Y));
-				if (zone == null)
+				if (zone == null || zones.Contains(zone))
 					continue;
 				zones.Add(zone);
 			}
