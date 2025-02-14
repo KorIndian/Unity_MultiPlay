@@ -13,6 +13,16 @@ namespace Server
 		Dictionary<int, ClientSession> _sessions = new Dictionary<int, ClientSession>();
 		object _lock = new object();
 
+		public List<ClientSession> GetSessions()
+		{
+			List<ClientSession> clientSessions = new List<ClientSession>();
+			lock (_lock)
+			{
+				clientSessions.AddRange(_sessions.Values);
+			}
+			return clientSessions;
+		}
+
 		public ClientSession GenerateClientSession()
 		{
 			lock (_lock)

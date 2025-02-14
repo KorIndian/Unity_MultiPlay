@@ -64,7 +64,7 @@ namespace Server
             }
         }
 
-        public void Flush()
+        public void FlushJobs()
         {
             _timer.Flush();
 

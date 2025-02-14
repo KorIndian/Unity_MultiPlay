@@ -29,14 +29,11 @@ public partial class GameRoom : JobSerializer
 		//
 	}
 
-	public void Update(long TickInterval)
+	public void Update()
 	{
-		//foreach (Monster monster in _monsters.Values)
-		//{
-		//	monster.Update();
-		//}
-		Flush();
+		FlushJobs();
 
+		//몬스러 리젠코드 (임시)
 		if (_monsters.Values.Count == 0 && !bRespawning)
 		{
 			bRespawning = true;

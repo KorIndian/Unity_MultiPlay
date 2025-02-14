@@ -129,8 +129,12 @@ namespace Server
 			}
 
 			ServerState = PlayerServerState.ServerStateGame;
-			GameRoom room = RoomManager.Instance.Find(1);
-			room.PushJob(room.EnterGame, MyPlayer);
+
+			GameLogic.Instance.PushJob(() =>
+			{
+				GameRoom room = GameLogic.Instance.Find(1);
+				room.PushJob(room.EnterGame, MyPlayer);
+			});
 		}
 
 		public void HandleCreatePlayer(C_CreatePlayer createPlayerPkt)

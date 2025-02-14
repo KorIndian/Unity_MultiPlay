@@ -27,10 +27,6 @@ public class ServerSession : PacketSession
     public override void OnConnected(EndPoint endPoint)
 	{
 		Debug.Log($"OnConnected : {endPoint}");
-		//PacketManager.Instance.CustomHandler = (s, m, i) =>
-		//{
-		//	PacketQueue.Instance.Push(i, m);
-		//};
 	}
 
 	public override void OnDisconnected(EndPoint endPoint)
