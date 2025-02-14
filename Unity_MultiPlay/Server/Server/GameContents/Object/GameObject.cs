@@ -136,7 +136,7 @@ namespace Server.GameContents
             S_ChangeHp hpPacket = new S_ChangeHp();
             hpPacket.ObjectId = ObjectId;
             hpPacket.Hp = Stat.Hp;
-            Room.Broadcast(hpPacket);
+            Room.BroadcastVisionBound(CellPos, hpPacket);
 
             if (Stat.Hp <= 0)
             {
@@ -153,7 +153,7 @@ namespace Server.GameContents
             S_Die diePacket = new S_Die();
             diePacket.ObjectId = ObjectId;
             diePacket.AttackerId = attacker.ObjectId;
-            room.Broadcast(diePacket);
+            room.BroadcastVisionBound(CellPos, diePacket);
 
             room.LeaveGame(ObjectId);
         }

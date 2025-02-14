@@ -17,15 +17,22 @@ public class ObjectManager
 
 	public void AddObject(ObjectInfo info, bool bMyPlayer = false)
     {
+		if (_objects.ContainsKey(info.ObjectId))
+		{
+			Debug.Log($"Already Spawnd id : {info.ObjectId}");
+			return;
+		}
 		GameObjectType type = GetGameObjectTypeById(info.ObjectId);
-		if(type == GameObjectType.Player)
+		GameObject go = null;
+		if (type == GameObjectType.Player)
         {
             if (bMyPlayer)//내 플레이어를 소환해야 하는 경우.
             {
-                GameObject go = Managers.Resource.Instantiate("Creature/MyPlayer");
-                go.name = info.Name;
-                _objects.Add(info.ObjectId, go);//PlayerId는 서버가 발급하게 되어있다.
+				if (MyPlayer != null && MyPlayer.ObjectId == info.ObjectId)
+					return;
 
+				go = Managers.Resource.Instantiate("Creature/MyPlayer");
+                go.name = info.Name;
                 MyPlayer = go.GetComponent<MyPlayerController>();
                 MyPlayer.ObjectId = info.ObjectId;
                 MyPlayer.PosInfo = info.PosInfo;
@@ -35,10 +42,8 @@ public class ObjectManager
 			}
             else//다른 유저플레이어를 소환해야하는 경우.
             {
-                GameObject go = Managers.Resource.Instantiate("Creature/Player");
+                go = Managers.Resource.Instantiate("Creature/Player");
                 go.name = info.Name;
-                _objects.Add(info.ObjectId, go);
-
                 PlayerController pc = go.GetComponent<PlayerController>();
                 pc.ObjectId = info.ObjectId;
                 pc.PosInfo = info.PosInfo;
@@ -49,11 +54,9 @@ public class ObjectManager
 		else if(type == GameObjectType.Monster)
         {
 			DataManager.MonsterDict.TryGetValue(info.TemplateId, out var monsterdata);
-            GameObject go = Managers.Resource.Instantiate(monsterdata.prefabPath);
+            go = Managers.Resource.Instantiate(monsterdata.prefabPath);
 
             go.name = info.Name;
-            _objects.Add(info.ObjectId, go);
-
 			MonsterController mc = go.GetComponent<MonsterController>();
             mc.ObjectId = info.ObjectId;
             mc.PosInfo = info.PosInfo;
@@ -62,17 +65,21 @@ public class ObjectManager
         }
         else if (type == GameObjectType.Projectile)
         {
-			GameObject go = Managers.Resource.Instantiate("Creature/Arrow");
-			
+			go = Managers.Resource.Instantiate("Creature/Arrow");
 			go.name = "Arrow";
-			_objects.Add(info.ObjectId, go);
 
 			ArrowController ac = go.GetComponent<ArrowController>();
 			ac.PosInfo = info.PosInfo;
 			ac.Stat = info.StatInfo;
 			ac.SyncPos();
         }
-    }
+
+		if(go != null)
+		{
+			_objects.Add(info.ObjectId, go);
+			Debug.Log($"Spawnd id : {info.ObjectId}");
+		}
+	}
 
 	public void Add(int id, GameObject go)
 	{
@@ -86,7 +93,8 @@ public class ObjectManager
             return;
 
         _objects.Remove(id);
-        Managers.Resource.Destroy(go);
+		Debug.Log($"Removed id : {id}");
+		Managers.Resource.Destroy(go);
     }
 
 	public GameObject FindById(int id)

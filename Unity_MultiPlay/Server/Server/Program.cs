@@ -39,8 +39,6 @@ namespace Server
 			while (true)
 			{
 				DbTransaction.Instance.FlushJobs();
-				Thread.Sleep(0);//while루프 끝에 슬립을 한번씩 호출해주면 커널이 소유권을 잠시 넘겨받게되어,
-				//계속 쓰레드를 점유하는 것이 아닌, 논리코어처럼 동작하게된다. 
 			}
 		}
 
@@ -53,7 +51,6 @@ namespace Server
 				{
 					session.FlushSend();
 				}
-				Thread.Sleep(0);
 			}
 		}
 

@@ -120,7 +120,7 @@ namespace Server.GameContents
             S_Move movePacket = new S_Move();
             movePacket.ObjectId = ObjectId;
             movePacket.PosInfo = PosInfo;
-            Room.Broadcast(movePacket);
+            Room.BroadcastVisionBound(CellPos, movePacket);
 
             void BeforeTerminate()
             {
@@ -164,7 +164,7 @@ namespace Server.GameContents
                 S_Skill skillPacket = new S_Skill() { Info = new SkillInfo() };
                 skillPacket.ObjectId = ObjectId;
                 skillPacket.Info.SkillId = skilldata.id;
-                Room.Broadcast(skillPacket);
+                Room.BroadcastVisionBound(CellPos, skillPacket);
 
                 //스킬 쿨타임 적용
                 int coolTick = (int)(1000 * skilldata.cooldown);
@@ -201,7 +201,7 @@ namespace Server.GameContents
             S_Move movePacket = new S_Move();
             movePacket.ObjectId = ObjectId;
             movePacket.PosInfo = PosInfo;
-            Room.Broadcast(movePacket);
+            Room.BroadcastVisionBound(CellPos, movePacket);
         }
 
         public override void OnDead(GameObject attacker)

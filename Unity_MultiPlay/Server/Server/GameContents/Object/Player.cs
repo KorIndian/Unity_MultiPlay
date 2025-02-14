@@ -12,6 +12,7 @@ namespace Server.GameContents
     {
         public int PlayerDbId { get; set; }
         public ClientSession Session { get; set; }
+		public VisionBox VisibleBox { get; private set; }
         public Inventory Inventory { get; private set; } = new Inventory();
 
 		public int WeaponDamage { get; private set; } = 0;
@@ -20,10 +21,14 @@ namespace Server.GameContents
 		public override int TotalAttack { get => Stat.Attack + WeaponDamage; }
 		public override int TotalDefence { get => ArmorDefence; }
 
+		public int CurrentZoneXIndex => Room.GetZone(CellPos).IndexX;
+		public int CurrentZoneYIndex => Room.GetZone(CellPos).IndexY;
+
 		public Player()
         {
             ObjectType = GameObjectType.Player;
-        }
+			VisibleBox = new VisionBox(this);
+		}
 
         public override void OnDamaged(GameObject attacker, int damage)
         {

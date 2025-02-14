@@ -148,6 +148,8 @@ namespace Server.GameContents
 			if (cellPos.y < MinY || cellPos.y > MaxY)
 				return null;
 
+			//Vector2Int 는 원점이 좌하단 좌표계를 쓰고
+			//Map의 cell좌표계는 원점이 좌측 상단에 있기때문에 좌표계를 변환해주는 것이다.
 			int x = cellPos.x - MinX;
 			int y = MaxY - cellPos.y;
 			return _objects[y, x];
@@ -193,6 +195,41 @@ namespace Server.GameContents
 				int x = dest.x - MinX;
 				int y = MaxY - dest.y;
 				_objects[y, x] = gameObject;
+			}
+
+			GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
+			if (type == GameObjectType.Player)
+			{
+				Player player = (Player)gameObject;
+				Zone CurrentZone = player.Room.GetZone(player.CellPos);
+				Zone AfterZone = player.Room.GetZone(dest);
+				if (CurrentZone != AfterZone)
+				{
+					CurrentZone.RemovePlayer(player);
+					AfterZone.AddPlayer(player);
+				}
+			}
+			else if (type == GameObjectType.Monster)
+			{
+				Monster monster = (Monster)gameObject;
+				Zone CurrentZone = monster.Room.GetZone(monster.CellPos);
+				Zone AfterZone = monster.Room.GetZone(dest);
+				if (CurrentZone != AfterZone)
+				{
+					CurrentZone.RemoveMonster(monster);
+					AfterZone.AddMonster(monster);
+				}
+			}
+			else if (type == GameObjectType.Projectile)
+			{
+				Projectile projectile = (Projectile)gameObject;
+				Zone CurrentZone = projectile.Room.GetZone(projectile.CellPos);
+				Zone AfterZone = projectile.Room.GetZone(dest);
+				if (CurrentZone != AfterZone)
+				{
+					CurrentZone.RemoveProjectile(projectile);
+					AfterZone.AddProjectile(projectile);
+				}
 			}
 
 			// 실제 좌표 이동

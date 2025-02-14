@@ -25,7 +25,7 @@ namespace Server.GameContents
 		public GameRoom CreateAndAddRoom(int mapId)
 		{
 			GameRoom gameRoom = new GameRoom();
-			gameRoom.PushJob(gameRoom.Init, mapId);
+			gameRoom.PushJob(gameRoom.Init, mapId, 10, 10);
 
 			gameRoom.RoomId = GenRoomId;
 			_rooms.Add(GenRoomId, gameRoom);

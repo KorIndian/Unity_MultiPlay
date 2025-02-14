@@ -44,7 +44,7 @@ namespace Server.GameContents
                 S_Move movePacket = new S_Move();
                 movePacket.ObjectId = ObjectId;
                 movePacket.PosInfo = PosInfo;
-                Room.Broadcast(movePacket);
+                Room.BroadcastVisionBound(CellPos,movePacket);
                 Console.WriteLine("Move Arrow");
             }
             else

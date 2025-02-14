@@ -36,7 +36,7 @@ public partial class GameRoom
 		resMovePacket.ObjectId = player.Info.ObjectId;
 		resMovePacket.PosInfo = movePacket.PosInfo;
 
-		Broadcast(resMovePacket);
+		BroadcastVisionBound(player.CellPos, resMovePacket);
 	}
 
 	public void HandleSkill(Player player, C_Skill skillPacket)
@@ -54,7 +54,7 @@ public partial class GameRoom
 
 		ServerSkillPacket.ObjectId = info.ObjectId;
 		ServerSkillPacket.Info.SkillId = skillPacket.Info.SkillId;
-		Broadcast(ServerSkillPacket);
+		BroadcastVisionBound(player.CellPos, ServerSkillPacket);
 
 		SkillData skillData = null;
 		if (DataManager.SkillDict.TryGetValue(skillPacket.Info.SkillId, out skillData) == false)
