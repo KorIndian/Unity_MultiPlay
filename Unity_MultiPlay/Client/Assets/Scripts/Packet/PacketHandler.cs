@@ -121,8 +121,9 @@ class PacketHandler
         Debug.Log("S_ConnectedHandler");
         C_LoginRequest LoginRequest = new C_LoginRequest();
 
-        LoginRequest.UniqueId = SystemInfo.deviceUniqueIdentifier;
-        Managers.Network.Send(LoginRequest);
+        string dataPath = Application.dataPath;//같은 디바이스에서 다수의 플레이어로 실행 할 수 있도록.
+        LoginRequest.UniqueId = dataPath.GetHashCode().ToString();
+		Managers.Network.Send(LoginRequest);
 
 	}
 
@@ -217,5 +218,12 @@ class PacketHandler
 	public static void S_ChangeStatHandler(PacketSession session, IMessage message)
 	{
 		S_ChangeStat ChangeStat = (S_ChangeStat)message;
+	}
+
+	public static void S_PingHandler(PacketSession session, IMessage message)
+	{
+        Debug.Log("S_PingHandler : Server ping check");
+        C_Pong pongPacket = new C_Pong();
+        Managers.Network.Send(pongPacket);
 	}
 }

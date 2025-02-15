@@ -18,13 +18,13 @@
       "Id": "100",
       "Name": "뼈 갑옷",
       "ArmorType": "Armor",
-      "Defence": "5"
+      "Defence": "10"
     },
     {
       "Id": "101",
       "Name": "뼈 투구",
       "ArmorType": "Helmet",
-      "Defence": "5"
+      "Defence": "10"
     }
   ],
   "ConsumableInfos": [

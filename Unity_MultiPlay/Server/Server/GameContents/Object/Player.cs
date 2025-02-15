@@ -49,7 +49,7 @@ namespace Server.GameContents
             PosInfo.PosX = 0;
             PosInfo.PosY = 0;
 
-            room.EnterGame(this);
+            room.EnterGame(this, true);
         }
 
         public void OnLeaveGame()//OnDisConnected시에 호출된다.

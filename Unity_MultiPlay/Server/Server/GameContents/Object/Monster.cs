@@ -27,7 +27,7 @@ namespace Server.GameContents
             ObjectType = GameObjectType.Monster;
         }
 
-        public void Init(int templateId)
+        public void InitByTemplatedId(int templateId)
         {
             TemplateId = templateId;
             DataManager.MonsterDict.TryGetValue(templateId, out var data);

@@ -133,7 +133,7 @@ namespace Server
 			GameLogic.Instance.PushJob(() =>
 			{
 				GameRoom room = GameLogic.Instance.Find(1);
-				room.PushJob(room.EnterGame, MyPlayer);
+				room.PushJob(room.EnterGame, MyPlayer, true);
 			});
 		}
 

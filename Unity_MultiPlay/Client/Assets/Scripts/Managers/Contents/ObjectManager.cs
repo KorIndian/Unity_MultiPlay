@@ -77,7 +77,7 @@ public class ObjectManager
 		if(go != null)
 		{
 			_objects.Add(info.ObjectId, go);
-			Debug.Log($"Spawnd id : {info.ObjectId}");
+			//Debug.Log($"Spawnd id : {info.ObjectId}");
 		}
 	}
 
@@ -88,6 +88,9 @@ public class ObjectManager
 
 	public void Remove(int id)
 	{
+		if (!_objects.ContainsKey(id))
+			return;
+
 		GameObject go = FindById(id);
 		if (go == null)
             return;

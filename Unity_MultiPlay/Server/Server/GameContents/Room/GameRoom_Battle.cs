@@ -87,7 +87,7 @@ public partial class GameRoom
 					arrow.PosInfo.PosX = player.PosInfo.PosX;
 					arrow.PosInfo.PosY = player.PosInfo.PosY;
 					arrow.Speed = skillData.projectileInfo.speed;
-					PushJob(EnterGame, arrow);
+					PushJob(EnterGame, arrow, false);
 				}
 				break;
 		}

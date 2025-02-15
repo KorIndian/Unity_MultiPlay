@@ -168,6 +168,9 @@ namespace Server.GameContents
 			if (posInfo.PosY < MinY || posInfo.PosY > MaxY)
 				return false;
 
+			Zone zone = gameObject.Room.GetZone(gameObject.CellPos);
+			zone.RemoveObject(gameObject);
+
 			{
 				int x = posInfo.PosX - MinX;
 				int y = MaxY - posInfo.PosY;
@@ -178,23 +181,31 @@ namespace Server.GameContents
 			return true;
 		}
 
-		public bool ApplyMove(GameObject gameObject, Vector2Int dest)
+		public bool ApplyMove(GameObject gameObject, Vector2Int dest, bool checkObjects = true, bool applyCollision =true)
 		{
-			ApplyLeave(gameObject);
-
 			if (gameObject.Room == null)
 				return false;
 			if (gameObject.Room.Map != this)
 				return false;
 
 			PositionInfo posInfo = gameObject.PosInfo;
-			if (CanGo(dest, true) == false)
+			if (CanGo(dest, checkObjects) == false)
 				return false;
 
+			if(applyCollision)
 			{
-				int x = dest.x - MinX;
-				int y = MaxY - dest.y;
-				_objects[y, x] = gameObject;
+				{
+					int x = posInfo.PosX - MinX;
+					int y = MaxY - posInfo.PosY;
+					if (_objects[y, x] == gameObject)
+						_objects[y, x] = null;
+				}
+
+				{
+					int x = dest.x - MinX;
+					int y = MaxY - dest.y;
+					_objects[y, x] = gameObject;
+				}
 			}
 
 			GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
@@ -250,7 +261,7 @@ namespace Server.GameContents
 			MaxX = int.Parse(reader.ReadLine());
 			MinY = int.Parse(reader.ReadLine());
 			MaxY = int.Parse(reader.ReadLine());
-
+			
 			int xCount = MaxX - MinX + 1;
 			int yCount = MaxY - MinY + 1;
 			_collision = new bool[yCount, xCount];
@@ -273,7 +284,7 @@ namespace Server.GameContents
 		int[] _deltaX = new int[] { 0, 0, -1, 1 };
 		int[] _DirectionCost = new int[] { 10, 10, 10, 10 };
 
-		public List<Vector2Int> FindPath(Vector2Int startCellPos, Vector2Int destCellPos, bool CheckObject = false)
+		public List<Vector2Int> FindPath(Vector2Int startCellPos, Vector2Int destCellPos, bool CheckObject = false, int maxDist = 10)
 		{
 			List<Pos> path = new List<Pos>();
 
@@ -326,6 +337,10 @@ namespace Server.GameContents
 				{
 					Pos NextPos = new Pos(PQnode.Y + _deltaY[i], PQnode.X + _deltaX[i]);
 
+					//탐색범위가 너무 멀면 스킵
+					if (Math.Abs(currentPos.X - NextPos.X) + Math.Abs(currentPos.Y - NextPos.Y) > maxDist)
+						continue;
+
 					// 유효 범위를 벗어났으면 스킵, 벽으로 막혀서 갈 수 없으면 스킵(가지치기)
 					if (NextPos.Y != Dest.Y || NextPos.X != Dest.X)
 					{
@@ -367,6 +382,26 @@ namespace Server.GameContents
 		List<Vector2Int> MakePathsFromParents(Dictionary<Pos, Pos> parentChildLinks, Pos dest)
 		{
 			List<Vector2Int> PathCells = new List<Vector2Int>();
+			
+			if(parentChildLinks.ContainsKey(dest) == false)
+			{
+				//목적지 까지 길이 없으면 찾은 셀중에서 가장 목적지와 가까운 곳을 목적지로 바꾼다.
+				Pos bestPos = new Pos();
+				int bestDist = int.MaxValue;
+				
+				foreach(Pos p in parentChildLinks.Keys)
+				{
+					int dist = Math.Abs(dest.Y - p.Y) + Math.Abs(dest.X - p.X);
+					if(dist < bestDist)
+					{
+						bestPos = p;
+						bestDist = dist; 
+					}
+				}
+
+				dest = bestPos;
+			}
+
 			Pos pos = dest;
 			while (parentChildLinks[pos] != pos)
 			{

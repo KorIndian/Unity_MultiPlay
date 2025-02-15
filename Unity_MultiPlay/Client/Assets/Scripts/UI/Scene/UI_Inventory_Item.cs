@@ -3,10 +3,8 @@ using Google.Protobuf.Protocol;
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 public class UI_Inventory_Item : UI_Base
 {

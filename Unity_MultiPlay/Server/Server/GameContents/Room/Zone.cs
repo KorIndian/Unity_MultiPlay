@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Protobuf.Protocol;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -14,13 +15,10 @@ public class Zone
 	public int IndexY { get; private set; }
 	public int IndexX { get; private set; }
 
-	
+
 	public HashSet<Player> Players = new HashSet<Player>();
 	public HashSet<Monster> Monsters { get; set; } = new HashSet<Monster>();
 	public HashSet<Projectile> Projectiles { get; set; } = new HashSet<Projectile>();
-
-	public HashSet<GameObject> Objects { get; set; } = new HashSet<GameObject>();
-
 
 	public Zone(int YIndex, int XIndex)
 	{
@@ -30,12 +28,32 @@ public class Zone
 
 	public bool AddObject(GameObject gameObject)
 	{
-		return Objects.Add(gameObject);
+		GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
+		switch (type)
+		{
+			case GameObjectType.Player:
+				return AddPlayer((Player)gameObject);
+			case GameObjectType.Monster:
+				return AddMonster((Monster)gameObject);
+			case GameObjectType.Projectile:
+				return AddProjectile((Projectile)gameObject);
+		}
+		return false;
 	}
 
 	public bool RemoveObject(GameObject gameObject)
 	{
-		return Objects.Remove(gameObject);
+		GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
+		switch (type)
+		{
+			case GameObjectType.Player:
+				return RemovePlayer((Player)gameObject);
+			case GameObjectType.Monster:
+				return RemoveMonster((Monster)gameObject);
+			case GameObjectType.Projectile:
+				return RemoveProjectile((Projectile)gameObject);
+		}
+		return false;
 	}
 
 	public bool AddPlayer(Player player)

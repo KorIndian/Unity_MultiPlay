@@ -29,7 +29,7 @@ public class MapEditor
         foreach (GameObject go in gameObjects)
         {
             Tilemap tmBase = Util.FindChild<Tilemap>(go, "Tilemap_Base", true);
-            Tilemap tm = Util.FindChild<Tilemap>(go, "Tilemap_Collision", true);
+            Tilemap tmCollision = Util.FindChild<Tilemap>(go, "Tilemap_Collision", true);
 
             using (var writer = File.CreateText($"{pathPrefix}/{go.name}.txt"))
             {
@@ -42,7 +42,7 @@ public class MapEditor
                 {
                     for (int x = tmBase.cellBounds.xMin; x <= tmBase.cellBounds.xMax; x++)
                     {
-                        TileBase tile = tm.GetTile(new Vector3Int(x, y, 0));
+                        TileBase tile = tmCollision.GetTile(new Vector3Int(x, y, 0));
                         if (tile != null)
                             writer.Write("1");
                         else

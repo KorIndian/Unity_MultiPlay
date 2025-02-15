@@ -82,4 +82,10 @@ class PacketHandler
 
 		room.PushJob(room.HandleEquipItem, player, equipPacket);
 	}
+
+	public static void C_PongHandler(PacketSession session, IMessage message)
+	{
+		ClientSession clientSession = (ClientSession)session;
+        clientSession.HandlePong();
+	}
 }

@@ -20,14 +20,14 @@
       "Id": "100",
       "Name": "Leather Armor",
       "ArmorType": "Armor",
-      "Defence": "5",
+      "Defence": "10",
       "IconPath": "Textures/Equipment/LeatherArmor"
     },
     {
       "Id": "101",
       "Name": "Leather Helmet",
       "ArmorType": "Helmet",
-      "Defence": "5",
+      "Defence": "10",
       "IconPath": "Textures/Equipment/LeatherHelmet"
     }
   ],

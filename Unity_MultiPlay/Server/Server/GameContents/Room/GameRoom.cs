@@ -22,6 +22,8 @@ public partial class GameRoom : JobSerializer
 
 	public Map Map { get; private set; } = new Map();
 
+	public int MonsterMaxCount { get; private set; } = 50;
+
 	public const int VisionBounds = 5;
 
 	bool bRespawning = false;
@@ -45,30 +47,25 @@ public partial class GameRoom : JobSerializer
 			}
 		}
 
-		//Temp
-		Monster monster = ObjectManager.Instance.AddObject<Monster>();
-		monster.Init(1);
-		monster.CellPos = new Vector2Int(5, 5);
-		EnterGame(monster);
-		//
+		MonsterGenerate();
 	}
 
 	public void Update()
 	{
 		FlushJobs();
 
-		//몬스러 리젠코드 (임시)
-		if (_monsters.Values.Count == 0 && !bRespawning)
+	}
+
+	public void MonsterGenerate()
+	{
+		PushAfter(MonsterGenerate, 1000);
+
+		if (MonsterMaxCount > _monsters.Values.Count)
 		{
-			bRespawning = true;
-			PushAfter(() =>
-			{
-				Monster monster = ObjectManager.Instance.AddObject<Monster>();
-				monster.Init(1);
-				monster.CellPos = new Vector2Int(5, 5);
-				EnterGame(monster);
-				bRespawning = false;
-			}, 1000);
+			Monster monster = ObjectManager.Instance.AddObject<Monster>();
+			monster.InitByTemplatedId(1);
+			EnterGame(monster, true);
+			return;
 		}
 	}
 
@@ -87,10 +84,26 @@ public partial class GameRoom : JobSerializer
 		return Zones[Yindex, Xindex];
 	}
 
-	public void EnterGame(GameObject gameObject)
+	Random rand = new Random();
+	public void EnterGame(GameObject gameObject, bool bRandomPos = false)
 	{
 		if (gameObject == null)
 			return;
+
+		if(bRandomPos)
+		{
+			Vector2Int randomPos = new();
+			while (true)
+			{
+				randomPos.x = rand.Next(Map.MinX, Map.MaxX + 1);
+				randomPos.y = rand.Next(Map.MinY, Map.MaxY + 1);
+				if (Map.Find(randomPos) == null && Map.CanGo(randomPos))
+				{
+					gameObject.CellPos = randomPos;
+					break; 
+				}
+			}
+		}
 
 		GameObjectType type = ObjectManager.GetObjectTypeById(gameObject.ObjectId);
 
@@ -110,6 +123,25 @@ public partial class GameRoom : JobSerializer
 				S_EnterGame enterPacket = new S_EnterGame();
 				enterPacket.ObjectInfo = player.Info;
 				player.Session.Send(enterPacket);
+
+				S_Spawn spawnPacket = new S_Spawn();
+				//기존에 접속해서 스폰되어있던 플레이어들을 알아야 클라이언트에서 똑같이 스폰할 수 있기때문에,
+				//내가 들어왔을때 기존에 있었던 플레이어리스트를 나에게 전송.
+				foreach (Player p in _players.Values)
+				{
+					if (gameObject != p)
+						spawnPacket.ObjectInfos.Add(p.Info);
+				}
+				foreach (Monster m in _monsters.Values)
+				{
+					spawnPacket.ObjectInfos.Add(m.Info);
+				}
+				foreach (Projectile p in _projectiles.Values)
+				{
+					spawnPacket.ObjectInfos.Add(p.Info);
+				}
+				player.Session.Send(spawnPacket);
+
 				player.VisibleBox.Update();
 			}
 		}
@@ -147,15 +179,14 @@ public partial class GameRoom : JobSerializer
 	public void LeaveGame(int objectId)
 	{
 		GameObjectType type = ObjectManager.GetObjectTypeById(objectId);
-
+		Vector2Int cellPos = new();
 		if (type == GameObjectType.Player)
 		{
 			Player player;
 			if (_players.Remove(objectId, out player) == false)
 				return;
-
-			GetZone(player.CellPos).RemovePlayer(player);
-
+			cellPos = player.CellPos;
+			
 			player.OnLeaveGame();
 			Map.ApplyLeave(player);
 			player.Room = null;
@@ -172,7 +203,8 @@ public partial class GameRoom : JobSerializer
 			Monster monster = null;
 			if (_monsters.Remove(objectId, out monster) == false)
 				return;
-			GetZone(monster.CellPos).RemoveMonster(monster);
+			cellPos = monster.CellPos;
+			
 			Map.ApplyLeave(monster);
 			monster.Room = null;
 		}
@@ -181,9 +213,8 @@ public partial class GameRoom : JobSerializer
 			Projectile projectile = null;
 			if (_projectiles.Remove(objectId, out projectile) == false)
 				return;
-
-			GetZone(projectile.CellPos).RemoveProjectile(projectile);
-
+			cellPos = projectile.CellPos;
+			
 			Map.ApplyLeave(projectile);
 			projectile.Room = null;
 		}
@@ -191,9 +222,7 @@ public partial class GameRoom : JobSerializer
 		{
 			S_Despawn despawnPacket = new S_Despawn();
 			despawnPacket.ObjectIds.Add(objectId);
-			
-			var FindObject = ObjectManager.Instance.Find<GameObject>(objectId);
-			BroadcastVisionBound(FindObject.CellPos, despawnPacket);
+			BroadcastVisionBound(cellPos, despawnPacket);
 		}
 		ObjectManager.Instance.Remove(objectId);
 	}
