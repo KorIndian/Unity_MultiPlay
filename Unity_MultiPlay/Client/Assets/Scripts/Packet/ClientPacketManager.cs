@@ -4,6 +4,8 @@ using ServerCore;
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable 8600
+
 class PacketManager
 {
 	#region Singleton

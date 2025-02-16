@@ -56,12 +56,4 @@ public class UI_Inventory : UI_Scene
 
 	}
 
-	//public override void ToggleUI()
-	//{
-	//	if(gameObject.activeSelf)
-	//		gameObject.SetActive(false);
-	//	else 
-	//		gameObject.SetActive(true);
-	//}
-
 }

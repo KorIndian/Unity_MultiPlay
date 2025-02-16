@@ -29,12 +29,13 @@ namespace Server
 			if(_pingpongTick > 0)
 			{
 				long delta = System.Environment.TickCount64 - _pingpongTick;
-				if(delta > 30000)//30초 이상응답이 없으면 디스커넥트
+				if(delta > 30000)//30초 이상응답이 없으면 디스커넥트 
 				{
 					Console.WriteLine($"Disconnected By PingPong Check SessionId: {SessionId}");
 					Disconnect();
 					return;
 				}
+				//TODO : 클라이언트가 디버깅중일때 튕길 수 있으므로 '개발단계'에서는 선택적으로 할 수 있도록해야한다.
 			}
 
 			S_Ping pingPacket = new S_Ping();
