@@ -2,210 +2,275 @@
 using Server.Data;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Server.GameContents
 {
-    public class Monster : GameObject
-    {
-        Vector2Int _destCellPos;
-        int _skillRange = 1; //TODO 패킷에 필드 추가.
-        bool _isRange = false; //TODO 패킷에 필드 추가.
+	public class Monster : GameObject
+	{
+		Vector2Int _destCellPos;
+		int _skillRange = 1; //TODO 패킷에 필드 추가.
+		bool _isRange = false; //TODO 패킷에 필드 추가.
 
-        Player _target;
-        int _SearchCellDist = 8;
-        long _nextSearchTick = 0;
+		Player _target;
+		int _SearchCellDist = 8;
+		long _nextSearchTick = 0;
 
-        long _nextMoveTick = 0;
-        int _chaseCellDist = 15;
-        long _coolTime = 0;
+		long _nextMoveTick = 0;
+		int _chaseCellDist = 15;
+		long _coolTime = 0;
 
 		private IJob _updateJob;
 
 		public Monster()
-        {
-            ObjectType = GameObjectType.Monster;
-        }
+		{
+			ObjectType = GameObjectType.Monster;
+		}
 
-        public void InitByTemplatedId(int templateId)
-        {
-            TemplateId = templateId;
-            DataManager.MonsterDict.TryGetValue(templateId, out var data);
-            Info.Name = data.Name;
-            
-            Stat.MergeFrom(data.Stat);
-            Stat.Hp = data.Stat.MaxHp;
-            State = CreatureState.Idle;
-        }
+		public void InitByTemplatedId(int templateId)
+		{
+			TemplateId = templateId;
+			DataManager.MonsterDict.TryGetValue(templateId, out var data);
+			Info.Name = data.Name;
 
-        public override void Update()
-        {
-            switch(State)
-            {
-                case CreatureState.Idle:
-                    UpdateIdle();
-                    break;
-                case CreatureState.Moving:
-                    UpdateMoving();
-                    break;
-                case CreatureState.Skill:
-                    UpdateSkill();
-                    break;
-                case CreatureState.Dead:
-                    UpdateDead();
-                    break;
-            }
+			Stat.MergeFrom(data.Stat);
+			Stat.Hp = data.Stat.MaxHp;
+			State = CreatureState.Idle;
+		}
 
-            if (Room != null)
+		public override void Update()
+		{
+			switch (State)
+			{
+				case CreatureState.Idle:
+					UpdateIdle();
+					break;
+				case CreatureState.Moving:
+					UpdateMoving();
+					//UpdateMoving_Aync();
+					break;
+				case CreatureState.Skill:
+					UpdateSkill();
+					break;
+				case CreatureState.Dead:
+					UpdateDead();
+					break;
+			}
+
+			if (Room != null)
 				_updateJob = Room.PushAfter(Update, 200);
-        }
-        
-        protected virtual void UpdateIdle()
-        {
-            if (_nextSearchTick > Environment.TickCount64)
-                return;
-            _nextSearchTick = Environment.TickCount64 + 1000;
+		}
 
-            Player target = Room.FindPlayer(p =>
-            {
-                int CellDist = Vector2Int.GetCellDist(p.CellPos, CellPos);
-                return CellDist <= _SearchCellDist;
-            });
+		protected virtual void UpdateIdle()
+		{
+			if (_nextSearchTick > Environment.TickCount64)
+				return;
+			_nextSearchTick = Environment.TickCount64 + 1000;
 
-            if (target == null)
-                return;
+			Player target = Room.FindPlayer(p =>
+			{
+				int CellDist = Vector2Int.GetCellDist(p.CellPos, CellPos);
+				return CellDist <= _SearchCellDist;
+			});
 
-            _target = target;
-            State = CreatureState.Moving;
-        }
+			if (target == null)
+				return;
 
-        protected virtual void UpdateMoving()
-        {
-            if (_nextMoveTick > Environment.TickCount64)
-                return;
-            long moveTick = (long)(1000 / Speed);
-            _nextMoveTick = Environment.TickCount64 + moveTick;
+			_target = target;
+			State = CreatureState.Moving;
+		}
 
-            if(_target == null || _target.Room == null)
-            {
-                BeforeTerminate();
-                return;
-            }
-            int CellDist = Vector2Int.GetCellDist(_target.CellPos, CellPos);
-            if(CellDist == 0 || CellDist > _chaseCellDist)
-            {
-                BeforeTerminate();
-                return;
-            }
+		protected virtual void UpdateMoving()
+		{
+			if (_nextMoveTick > Environment.TickCount64)
+				return;
+			long moveTick = (long)(1000 / Speed);
+			_nextMoveTick = Environment.TickCount64 + moveTick;
 
-            List<Vector2Int> path = Room.Map.FindPath(CellPos, _target.CellPos, true);
+			if (_target == null || _target.Room == null)
+			{
+				BeforeTerminate();
+				return;
+			}
+			Vector2Int dir = _target.CellPos - CellPos;
+			//int CellDist = Vector2Int.GetCellDist(_target.CellPos, CellPos);
+			int dist = dir.CellDistFromZero;
+			if (dist == 0 || dist > _chaseCellDist)
+			{
+				BeforeTerminate();
+				return;
+			}
 
-            if (path.Count < 2 || path.Count > _chaseCellDist)
-            {
-                BeforeTerminate();
-                return;
-            }
-            
-            if (SkillRangeCheck())
-            {
-                _coolTime = 0;
-                State = CreatureState.Skill;
-                return;
-            }
+			List<Vector2Int> path = Room.Map.FindPath(CellPos, _target.CellPos, true);
+			
+			if (path.Count < 2 || path.Count > _chaseCellDist)
+			{
+				BeforeTerminate();
+				return;
+			}
 
-            //path[1] A*서치 의 첫번째인자는 현재위치에서 바로 1칸 떨어져있다.
-            Dir = GetDirFromVec(path[1] - CellPos);
-            Room.Map.ApplyMove(this, path[1]);
+			//스킬로 넘어갈지 체크
+			if (dist <= _skillRange && (dir.x == 0 || dir.y == 0))
+			{
+				_coolTime = 0;
+				State = CreatureState.Skill;
+				return;
+			}
 
-            S_Move movePacket = new S_Move();
-            movePacket.ObjectId = ObjectId;
-            movePacket.PosInfo = PosInfo;
-            Room.BroadcastVisionBound(CellPos, movePacket);
+			//path[1] A*서치 의 첫번째인자는 현재위치에서 바로 1칸 떨어져있다.
+			Dir = GetDirFromVec(path[1] - CellPos);
+			Room.Map.ApplyMove(this, path[1]);
 
-            void BeforeTerminate()
-            {
-                _target = null;
-                State = CreatureState.Idle;
-                BroadcastMove();
-            }
-        }
+			BroadcastMove();
 
-        protected virtual void UpdateSkill()
-        {
-            if(_coolTime == 0)
-            {
-                //유효한 타겟인지
-                if (_target == null || _target.Room == null || _target.Hp == 0)
-                {
-                    _target = null;
-                    State = CreatureState.Moving;
-                    BroadcastMove();
-                    return;
-                }
-                //스킬이 현재 사용 가능한지
-                if (!SkillRangeCheck())
-                {
-                    State = CreatureState.Moving;
-                    BroadcastMove();
-                }
-                //타게팅 방향 주시하도록 Dir설정.
-                Vector2Int dir = _target.CellPos - CellPos;
-                MoveDir LookDir = GetDirFromVec(dir);
-                if(Dir != LookDir)
-                {
-                    Dir = LookDir;
-                    BroadcastMove();
-                }
-                //데미지 적용
-                SkillData skilldata = null;
-                DataManager.SkillDict.TryGetValue(1, out skilldata);
-                  _target.OnDamaged(this, skilldata.damage + TotalAttack);
-                //스킬 사용 Broadcast
-                S_Skill skillPacket = new S_Skill() { Info = new SkillInfo() };
-                skillPacket.ObjectId = ObjectId;
-                skillPacket.Info.SkillId = skilldata.id;
-                Room.BroadcastVisionBound(CellPos, skillPacket);
+			void BeforeTerminate()
+			{
+				_target = null;
+				State = CreatureState.Idle;
+				BroadcastMove();
+			}
+		}
 
-                //스킬 쿨타임 적용
-                int coolTick = (int)(1000 * skilldata.cooldown);
-                _coolTime = Environment.TickCount64 + coolTick;
-            }
-            if (_coolTime > Environment.TickCount64)
-                return;
-            _coolTime = 0;
-        }
+		protected async void UpdateMoving_Aync()
+		{
+			if (_nextMoveTick > Environment.TickCount64)
+				return;
+			long moveTick = (long)(1000 / Speed);
+			_nextMoveTick = Environment.TickCount64 + moveTick;
 
-        protected virtual void UpdateDead()
-        {
-            
-        }
+			if (_target == null || _target.Room == null)
+			{
+				_target = null;
+				State = CreatureState.Idle;
+				BroadcastMove();
+				return;
+			}
+			Vector2Int dir = _target.CellPos - CellPos;
+			//int CellDist = Vector2Int.GetCellDist(_target.CellPos, CellPos);
+			int dist = dir.CellDistFromZero;
+			if (dist == 0 || dist > _chaseCellDist)
+			{
+				_target = null;
+				State = CreatureState.Idle;
+				BroadcastMove();
+				return;
+			}
+			Vector2Int targetCellPos = _target.CellPos;
+			GameRoom room = Room;
+			Task<List<Vector2Int>> task = Task.Run(() =>
+			{
+				return room.Map.FindPath(CellPos, targetCellPos, true);
+			});
 
-        protected virtual bool SkillRangeCheck()
-        {
-            if (_target != null)
-            {
-                Vector2Int dir = _target.CellPos - CellPos;
-                //사정거리 안에 있고, 일직선 상에 있으면
-                if (dir.Magnitude <= _skillRange && (dir.x == 0 || dir.y == 0))
-                {
-                    //Dir = GetDirFromVec(dir);
-                    //State = CreatureState.Skill;
-                    return true;
-                }
-            }
-            return false;
-        }
+			List<Vector2Int> path = await task;
 
-        protected void BroadcastMove()
-        {
-            S_Move movePacket = new S_Move();
-            movePacket.ObjectId = ObjectId;
-            movePacket.PosInfo = PosInfo;
-            Room.BroadcastVisionBound(CellPos, movePacket);
-        }
+			if (path.Count < 2 || path.Count > _chaseCellDist)
+			{
+				_target = null;
+				State = CreatureState.Idle;
+				BroadcastMove();
+				return;
+			}
 
-        public override void OnDead(GameObject attacker)
-        {
+			//스킬로 넘어갈지 체크
+			if (dist <= _skillRange && (dir.x == 0 || dir.y == 0))
+			{
+				_coolTime = 0;
+				State = CreatureState.Skill;
+				return;
+			}
+
+			//path[1] A*서치 의 첫번째인자는 현재위치에서 바로 1칸 떨어져있다.
+			Dir = GetDirFromVec(path[1] - CellPos);
+			Room.Map.ApplyMove(this, path[1]);
+
+			BroadcastMove();
+
+		}
+
+		protected virtual void UpdateSkill()
+		{
+			if (_coolTime == 0)
+			{
+				//유효한 타겟인지
+				if (_target == null || _target.Room == null)
+				{
+					_target = null;
+					State = CreatureState.Moving;
+					BroadcastMove();
+					return;
+				}
+				// 스킬이 아직 사용 가능한지
+				Vector2Int dir = (_target.CellPos - CellPos);
+				int dist = dir.CellDistFromZero;
+				bool canUseSkill = (dist <= _skillRange && (dir.x == 0 || dir.y == 0));
+				if (canUseSkill == false)
+				{
+					State = CreatureState.Moving;
+					BroadcastMove();
+					return;
+				}
+
+				//타게팅 방향 주시하도록 Dir설정.
+				MoveDir LookDir = GetDirFromVec(dir);
+				if (Dir != LookDir)
+				{
+					Dir = LookDir;
+					BroadcastMove();
+				}
+				//데미지 적용
+				SkillData skilldata = null;
+				DataManager.SkillDict.TryGetValue(1, out skilldata);
+
+				_target.OnDamaged(this, skilldata.damage + TotalAttack);
+				//스킬 사용 Broadcast
+				S_Skill skillPacket = new S_Skill() { Info = new SkillInfo() };
+				skillPacket.ObjectId = ObjectId;
+				skillPacket.Info.SkillId = skilldata.id;
+				Room.BroadcastVisionBound(CellPos, skillPacket);
+
+				//스킬 쿨타임 적용
+				int coolTick = (int)(1000 * skilldata.cooldown);
+				_coolTime = Environment.TickCount64 + coolTick;
+			}
+			if (_coolTime > Environment.TickCount64)
+				return;
+			_coolTime = 0;
+		}
+
+		protected virtual void UpdateDead()
+		{
+
+		}
+
+		protected virtual bool SkillRangeCheck()
+		{
+			if (_target != null)
+			{
+				Vector2Int dir = _target.CellPos - CellPos;
+				//사정거리 안에 있고, 일직선 상에 있으면
+				if (dir.Magnitude <= _skillRange && (dir.x == 0 || dir.y == 0))
+				{
+					Dir = GetDirFromVec(dir);
+					State = CreatureState.Skill;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		protected void BroadcastMove()
+		{
+			S_Move movePacket = new S_Move();
+			movePacket.ObjectId = ObjectId;
+			movePacket.PosInfo = PosInfo;
+			Room.BroadcastVisionBound(CellPos, movePacket);
+		}
+
+		public override void OnDead(GameObject attacker)
+		{
 			if (_updateJob != null)
 			{
 				_updateJob.Cancel = true;
@@ -213,35 +278,35 @@ namespace Server.GameContents
 			}
 
 			base.OnDead(attacker);
-            
-            GameObject Owner = attacker.GetOwner();
-            if(Owner.ObjectType == GameObjectType.Player)
-            {
-                RewardData rewardData = GetRandomRewarData();
-                if (rewardData != null)
-                {
-                    Player player = (Player)Owner;
-                    DbTransaction.RewardPlayer(player, rewardData, player.Room);
 
-                }
-            }
-        }
+			GameObject Owner = attacker.GetOwner();
+			if (Owner.ObjectType == GameObjectType.Player)
+			{
+				RewardData rewardData = GetRandomRewarData();
+				if (rewardData != null)
+				{
+					Player player = (Player)Owner;
+					DbTransaction.RewardPlayer(player, rewardData, player.Room);
 
-        public RewardData GetRandomRewarData()
-        {
-            DataManager.MonsterDict.TryGetValue(TemplateId, out var MonsterData);
-
-            int RandomNumber = new Random().Next(0, 101);//0~100사이의 랜덤 숫자
-            int SumOfProbability = 0;
-            foreach (RewardData data in MonsterData.Rewards)
-            {
-				SumOfProbability += data.Probability;
-                if(RandomNumber <= SumOfProbability)
-                {
-                    return data;
-                }
+				}
 			}
-            return null;
-        }
-    }
+		}
+
+		public RewardData GetRandomRewarData()
+		{
+			DataManager.MonsterDict.TryGetValue(TemplateId, out var MonsterData);
+
+			int RandomNumber = new Random().Next(0, 101);//0~100사이의 랜덤 숫자
+			int SumOfProbability = 0;
+			foreach (RewardData data in MonsterData.Rewards)
+			{
+				SumOfProbability += data.Probability;
+				if (RandomNumber <= SumOfProbability)
+				{
+					return data;
+				}
+			}
+			return null;
+		}
+	}
 }

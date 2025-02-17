@@ -1,4 +1,4 @@
 {
 "dataPath": "../../../../../Common/Data",
-"connectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GameDB;"
+"connectionString": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GameDataBase;"
 }

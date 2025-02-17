@@ -14,9 +14,10 @@ using static System.Net.Mime.MediaTypeNames;
 
 class PacketHandler
 {
+	//step 4
 	public static void S_EnterGameHandler(PacketSession session, IMessage packet)
 	{
-		S_EnterGame? enterGamePacket = packet as S_EnterGame;
+		S_EnterGame enterGamePacket = packet as S_EnterGame;
 
 	}
 
@@ -55,23 +56,52 @@ class PacketHandler
 	{
 		S_Die diePacket = packet as S_Die;
 	}
-
+	//step 1
 	public static void S_ConnectedHandler(PacketSession session, IMessage packet)
 	{
 		C_LoginRequest LoginRequest = new C_LoginRequest();
 
+		ServerSession serverSession = (ServerSession)session;
+		LoginRequest.UniqueId = $"DummyClient_{serverSession.DummyId}";
+		serverSession.Send(LoginRequest);
 	}
 
+	//step2
 	public static void S_LoginResultHandler(PacketSession session, IMessage packet)
 	{
 		S_LoginResult LoginResult = (S_LoginResult)packet;
-
+		ServerSession serverSession = (ServerSession)session;
+		//TODO 로비UI에서 캐릭터목록을 보여주고, 선택할 수 있도록
+		if (LoginResult.Players == null || LoginResult.Players.Count == 0)
+		{
+			C_CreatePlayer createPlayerPkt = new C_CreatePlayer();
+			createPlayerPkt.Name = $"Player_{serverSession.DummyId.ToString("0000")}";
+			serverSession.Send(createPlayerPkt);
+		}
+		else
+		{
+			LobbyPlayerInfo playerInfo = LoginResult.Players[0];
+			C_EnterGame enterGamePkt = new C_EnterGame();
+			enterGamePkt.Name = playerInfo.Name;
+			serverSession.Send(enterGamePkt);
+		}
 	}
 
+	//step3
 	public static void S_CreatePlayerHandler(PacketSession session, IMessage packet)
 	{
 		S_CreatePlayer createPlayerPacket = (S_CreatePlayer)packet;
-
+		ServerSession serverSession = (ServerSession)session;
+		if (createPlayerPacket.Player == null)
+		{
+			//더미 클라이언트에서는 재생성 시도를 생략한다.
+		}
+		else
+		{
+			C_EnterGame enterGamePkt = new C_EnterGame();
+			enterGamePkt.Name = createPlayerPacket.Player.Name;
+			serverSession.Send(enterGamePkt);
+		}
 	}
 
 	public static void S_ItemInfolistHandler(PacketSession session, IMessage message)

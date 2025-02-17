@@ -13,6 +13,9 @@ public class VisionBox
 	public readonly Player Owner;
 
 	public HashSet<GameObject> PreviousObjects { get; private set; } = new HashSet<GameObject>();
+
+	object _lock = new object();
+
 	public VisionBox(Player owner)
 	{
 		Owner = owner;
@@ -28,10 +31,10 @@ public class VisionBox
 		HashSet<GameObject> CurrentObjects = GatherObjects();
 		//기존에 없었는데 새로 생긴애들 spawn처리
 		List<GameObject> Added = CurrentObjects.Except(PreviousObjects).ToList();
-		if(Added.Count > 0)
+		if (Added.Count > 0)
 		{
 			S_Spawn spawnPacket = new S_Spawn();
-			foreach(GameObject gameObject in Added)
+			foreach (GameObject gameObject in Added)
 			{
 				ObjectInfo objectInfo = new ObjectInfo();
 				objectInfo.MergeFrom(gameObject.Info);
@@ -71,16 +74,22 @@ public class VisionBox
 			//Console.WriteLine($"Adjecent Zone ({zone.IndexY},{zone.IndexX})");
 			foreach (Player player in zone.Players)
 			{
-				if(IsVisionBound(player.CellPos))
+				if (player == null)
+					continue;
+				if (IsVisionBound(player.CellPos))
 					objects.Add(player);
 			}
 			foreach (Monster monster in zone.Monsters)
 			{
+				if (monster == null)
+					continue;
 				if (IsVisionBound(monster.CellPos))
 					objects.Add(monster);
 			}
 			foreach (Projectile projectile in zone.Projectiles)
 			{
+				if (projectile == null)
+					continue;
 				if (IsVisionBound(projectile.CellPos))
 					objects.Add(projectile);
 			}

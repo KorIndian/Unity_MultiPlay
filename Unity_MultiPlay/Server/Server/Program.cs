@@ -31,6 +31,7 @@ namespace Server
 			while (true)
 			{
 				GameLogic.Instance.Update();
+				//Thread.Sleep(0);
 			}
 		}
 
@@ -39,18 +40,21 @@ namespace Server
 			while (true)
 			{
 				DbTransaction.Instance.FlushJobs();
+				//Thread.Sleep(0);
 			}
 		}
 
-		static void NetworkTask()
+		static void NetworkSendTask()
 		{
 			while (true)
 			{
 				var sessions = SessionManager.Instance.GetSessions();
+				
 				foreach (var session in sessions)
 				{
 					session.FlushSend();
 				}
+				//Thread.Sleep(0);
 			}
 		}
 
@@ -72,17 +76,19 @@ namespace Server
 			//↑리스너 init시에 클라이언트에서 접속 요청이 왔을때 세션을 제너레이트해줄 함수를 등록해야한다. 
 			Console.WriteLine("Listening...");
 
-			{//GameLogic 전용 쓰레드 생성.
-				Task gameLogicTask = new Task(GameLogicTask, TaskCreationOptions.LongRunning);
-				gameLogicTask.Start();
+			{//DbTask 전용 쓰레드 생성.
+				Thread DbThread = new Thread(DbTask);
+				DbThread.Name = "DbThread";
+				DbThread.Start();
+			}
+			
+			{//NetWork 전용 쓰레드 생성.
+				Thread NetworkSendThread = new Thread(NetworkSendTask);
+				NetworkSendThread.Name = "NetworkSendThread";
+				NetworkSendThread.Start();
 			}
 
-			{//GameLogic 전용 쓰레드 생성.
-				Task netWorkTask = new Task(NetworkTask, TaskCreationOptions.LongRunning);
-				netWorkTask.Start();
-			}
-
-			DbTask();//메인 쓰레드 살려두는용도.
+			GameLogicTask();//게임 로직은 메인쓰레드가 담당.
 		}
 	}
 }

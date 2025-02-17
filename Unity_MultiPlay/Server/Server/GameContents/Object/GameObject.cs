@@ -130,7 +130,7 @@ namespace Server.GameContents
                 return;
 
             damage = Math.Max(damage - TotalDefence, 0);
-			Console.WriteLine($"Damage : {damage} HP: {Stat.Hp}");
+			//Console.WriteLine($"Damage : {damage} HP: {Stat.Hp}");
 
 			Stat.Hp = Math.Max(Stat.Hp - damage, 0);
             S_ChangeHp hpPacket = new S_ChangeHp();

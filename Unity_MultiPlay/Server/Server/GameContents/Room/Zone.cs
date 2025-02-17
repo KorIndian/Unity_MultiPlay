@@ -15,15 +15,46 @@ public class Zone
 	public int IndexY { get; private set; }
 	public int IndexX { get; private set; }
 
-
 	public HashSet<Player> Players = new HashSet<Player>();
 	public HashSet<Monster> Monsters { get; set; } = new HashSet<Monster>();
 	public HashSet<Projectile> Projectiles { get; set; } = new HashSet<Projectile>();
+
+	object _lock = new object();
 
 	public Zone(int YIndex, int XIndex)
 	{
 		IndexY = YIndex;
 		IndexX = XIndex;
+	}
+
+	public List<Player> GetPlayersSafe()
+	{
+		List<Player> players = new List<Player>();
+		lock (_lock)
+		{
+			players.AddRange(Players);
+		}
+		return players;
+	}
+
+	public List<Monster> GetMonstersSafe()
+	{
+		List<Monster> monsters = new List<Monster>();
+		lock (_lock)
+		{
+			monsters.AddRange(Monsters.ToList());
+		}
+		return monsters;
+	}
+
+	public List<Projectile> GetProjectilesSafe()
+	{
+		List<Projectile> projectiles = new List<Projectile>();
+		lock (_lock)
+		{
+			projectiles.AddRange(Projectiles.ToList());
+		}
+		return projectiles;
 	}
 
 	public bool AddObject(GameObject gameObject)

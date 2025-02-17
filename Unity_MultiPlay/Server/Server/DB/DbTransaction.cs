@@ -18,6 +18,12 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 {
 	public static DbTransaction Instance { get; } = new DbTransaction();
 
+	public void LogJobQue()
+	{
+		Console.WriteLine($"job count : {_jobQueue.Count}");
+		PushAfter(LogJobQue, 10);
+	}
+
 	public static void SaveDBPlayerStatus(Player player, GameRoom room)
 	{
 		//이 함수는 LeaveGame에서 불리고 있으므로, WorkerThread에서 처리중인 함수이다.
@@ -42,7 +48,7 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 				{
 					room.PushJob(() =>//room에다 push한람다는 room 쓰레드에서 실행된다. 
 					{
-						Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
+						//Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
 					});
 				}
 			}
@@ -77,7 +83,7 @@ public partial class DbTransaction : JobSerializer // main함수의 while루프�
 		{
 			room.PushJob(() =>
 			{
-				Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
+				//Console.WriteLine($"PlayerStaus Saved (Hp : {playerDb.Hp})");//여기서는 tracked엔티티다.
 			});
 		}
 		return;

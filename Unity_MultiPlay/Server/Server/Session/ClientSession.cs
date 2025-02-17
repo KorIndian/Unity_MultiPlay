@@ -23,7 +23,11 @@ namespace Server
 		object _lock = new object();
 		List<ArraySegment<byte>> _reserveQueue = new List<ArraySegment<byte>>();
 
+		int _reservedSendBytes = 0;
+		long _lastSendTick = 0;
+
 		long _pingpongTick = 0;
+
 		public void Ping()
 		{
 			if(_pingpongTick > 0)
@@ -64,6 +68,7 @@ namespace Server
 			lock (_lock)
 			{
 				_reserveQueue.Add(sendBuffer);
+				_reservedSendBytes += sendBuffer.Length;
 			}
 			//Send(new ArraySegment<byte>(sendBuffer));
         }
@@ -73,19 +78,31 @@ namespace Server
 			List<ArraySegment<byte>> sendList = null;
 			lock (_lock)
 			{
+				long deltaTime = Environment.TickCount64 - _lastSendTick;
+
 				if (_reserveQueue.Count == 0)
 					return;
 
-				sendList = _reserveQueue;
-				_reserveQueue = new List<ArraySegment<byte>>();
+				//패킷 모아보내기 : 0.1초가 지났거나, 10000바이트 이상 쌓여있으면 보낸다.
+				if (deltaTime > 100 || _reservedSendBytes >= 10000)
+				{
+					//패킷 모아보내기.
+					_reservedSendBytes = 0;
+					_lastSendTick = Environment.TickCount64;
+
+					sendList = _reserveQueue;
+					_reserveQueue = new List<ArraySegment<byte>>();
+					Send(sendList);
+				}
+				else 
+					return;
 			}
 
-			Send(sendList);
 		}
 
 		public override void OnConnected(EndPoint endPoint)
 		{
-			Console.WriteLine($"OnConnected : {endPoint}");
+			//Console.WriteLine($"OnConnected : {endPoint}");
 			{
 				S_Connected connectedPacket = new S_Connected();
 				Send(connectedPacket);
@@ -113,7 +130,6 @@ namespace Server
 			});
 			
 			SessionManager.Instance.Remove(this);
-			Console.WriteLine($"OnDisconnected : {endPoint}");
 		}
 
 		public override void OnSend(int numOfBytes)

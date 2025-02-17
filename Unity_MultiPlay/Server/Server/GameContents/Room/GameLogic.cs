@@ -12,6 +12,12 @@ namespace Server.GameContents
 
 		int GenRoomId = 1;
 
+		public void LogJobQue()
+		{
+			Console.WriteLine($"job count : {_jobQueue.Count}");
+			PushAfter(LogJobQue, 10);
+		}
+
 		public void Update()
 		{
 			FlushJobs();

@@ -21,7 +21,7 @@ namespace Server.DB
 			private set { connectionString = value; }
 		}
 
-		private string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GameDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+		private string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=GameDataBase;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
 		static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create( builder =>
 		{
@@ -33,7 +33,7 @@ namespace Server.DB
 			string connectStr = ConfigManager.Config == null ?  ConnectionString : ConfigManager.Config.connectionString;
 
 			optionsBuilder
-				.UseLoggerFactory(_loggerFactory)
+				//.UseLoggerFactory(_loggerFactory)
 				.UseSqlServer(connectStr);
 		}
 
