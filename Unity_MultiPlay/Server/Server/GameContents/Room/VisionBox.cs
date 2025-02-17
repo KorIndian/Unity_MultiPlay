@@ -67,7 +67,7 @@ public class VisionBox
 			return null;
 		HashSet<GameObject> objects = new HashSet<GameObject>();
 
-		List<Zone> zones = Owner.Room.GetAdjecentZones(Owner.CellPos);
+		List<Zone> zones = Owner.Room.GetAdjacentZones(Owner.CellPos);
 
 		foreach (Zone zone in zones)
 		{

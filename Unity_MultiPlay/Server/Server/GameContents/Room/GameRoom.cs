@@ -24,7 +24,7 @@ public partial class GameRoom : JobSerializer
 
 	public int MonsterMaxCount { get; private set; } = 1000;
 
-	public const int VisionBounds = 5;
+	public const int VisionBounds = 7;
 
 	bool bRespawning = false;
 
@@ -69,19 +69,24 @@ public partial class GameRoom : JobSerializer
 		}
 	}
 
-	public Zone GetZone(Vector2Int cellPos)
+	public Zone GetZoneByIndex(int indexY, int indexX)
+	{
+		if (indexX < 0 || indexX >= Zones.GetLength(1))
+			return null;
+		if (indexY < 0 || indexY >= Zones.GetLength(0))
+			return null;
+
+		return Zones[indexY, indexX];
+	}
+
+	public Zone GetZoneByCellPos(Vector2Int cellPos)
 	{
 		//Vector2Int 는 원점이 좌하단 좌표계를 쓰고
 		//Map의 cell좌표계는 원점이 좌측 상단에 있기때문에 좌표계를 변환해주는 것이다.
 		int Xindex = (cellPos.x - Map.MinX) / ZoneWidth;
 		int Yindex = (Map.MaxY - cellPos.y) / ZoneHeight;
 
-		if (Xindex < 0 || Xindex >= Zones.GetLength(1))
-			return null;
-		if (Yindex < 0 || Yindex >= Zones.GetLength(0))
-			return null;
-
-		return Zones[Yindex, Xindex];
+		return GetZoneByIndex(Yindex, Xindex);
 	}
 
 	Random rand = new Random();
@@ -116,7 +121,7 @@ public partial class GameRoom : JobSerializer
 			player.ReCalcAdditionalStat();
 
 			Map.ApplyMove(player, new Vector2Int(player.PosInfo.PosX, player.PosInfo.PosY));
-			GetZone(player.CellPos).AddPlayer(player);
+			GetZoneByCellPos(player.CellPos).AddPlayer(player);
 
 			//본인 클라이언트에도 접속되었음을 알림.
 			{
@@ -152,7 +157,7 @@ public partial class GameRoom : JobSerializer
 			monster.Room = this;
 
 			Map.ApplyMove(monster, new Vector2Int(monster.PosInfo.PosX, monster.PosInfo.PosY));
-			GetZone(monster.CellPos).AddMonster(monster);
+			GetZoneByCellPos(monster.CellPos).AddMonster(monster);
 			monster.Update();
 		}
 		else if (type == GameObjectType.Projectile)
@@ -160,7 +165,7 @@ public partial class GameRoom : JobSerializer
 			Projectile projectile = gameObject as Projectile;
 			_projectiles.Add(gameObject.ObjectId, projectile);
 
-			GetZone(projectile.CellPos).AddProjectile(projectile);
+			GetZoneByCellPos(projectile.CellPos).AddProjectile(projectile);
 
 			projectile.Room = this;
 			projectile.Update();
@@ -229,7 +234,7 @@ public partial class GameRoom : JobSerializer
 
 	public void BroadcastVisionBound(Vector2Int cellPos, IMessage packet)
 	{
-		List<Zone> zones = GetAdjecentZones(cellPos);
+		List<Zone> zones = GetAdjacentZones(cellPos);
 
 		foreach (Player player in zones.SelectMany(z => z.Players))
 		{
@@ -246,7 +251,7 @@ public partial class GameRoom : JobSerializer
 
 	public void BroadcastAdjecentZones(Vector2Int cellPos, IMessage packet)
 	{
-		List<Zone> zones = GetAdjecentZones(cellPos);
+		List<Zone> zones = GetAdjacentZones(cellPos);
 		foreach (Player player in zones.SelectMany(z => z.Players))
 		{
 			player.Session.Send(packet);
@@ -271,23 +276,69 @@ public partial class GameRoom : JobSerializer
 		return null;
 	}
 	
-	public List<Zone> GetAdjecentZones(Vector2Int cellPos, int bounds = VisionBounds)
+	public Player FindClosestPlayer(Vector2Int pos, int range)
+	{
+		List<Player> players = GetAdjacentPlayers(pos, range);
+
+		//가까운 순으로 정렬
+		players.Sort((left, right) =>
+		{
+			int leftDist = (left.CellPos - pos).CellDistFromZero;
+			int rightDist = (right.CellPos - pos).CellDistFromZero;
+			return leftDist - rightDist;
+		});
+
+		foreach (Player player in players)
+		{
+			List<Vector2Int> path = Map.FindPath(pos, player.CellPos, CheckObject: true);
+			if (path.Count < 2 || path.Count > range)
+				continue;
+
+			//발견하면 바로 리턴한다.
+			return player;
+		}
+
+		return null;
+	}
+
+	public List<Zone> GetAdjacentZones(Vector2Int cellPos, int bounds = VisionBounds)
 	{
 		HashSet<Zone> zones = new HashSet<Zone>();
-		int[] delta = new int[2] { -bounds,+bounds };
-		foreach (int dy in delta)
+
+		int maxY = cellPos.y + bounds;
+		int minY = cellPos.y - bounds;
+		int maxX = cellPos.x + bounds;
+		int minX = cellPos.x - bounds;
+
+		// 좌측 상단
+		Vector2Int leftTop = new Vector2Int(minX, maxY);
+		int minIndexY = (Map.MaxY - leftTop.y) / ZoneHeight;
+		int minIndexX = (leftTop.x - Map.MinX) / ZoneWidth;
+
+		// 우측 하단
+		Vector2Int rightBot = new Vector2Int(maxX, minY);
+		int maxIndexY = (Map.MaxY - rightBot.y) / ZoneHeight;
+		int maxIndexX = (rightBot.x - Map.MinX) / ZoneWidth;
+
+		for (int Xidx = minIndexX; Xidx <= maxIndexX; Xidx++)
 		{
-			foreach (int dx in delta)
+			for (int YIdx = minIndexY; YIdx <= maxIndexY; YIdx++)
 			{
-				int Y = cellPos.y + dy;
-				int X = cellPos.x + dx;
-				Zone zone = GetZone(new Vector2Int(X, Y));
-				if (zone == null || zones.Contains(zone))
+				Zone zone = GetZoneByIndex(YIdx, Xidx);
+				if (zone == null)
 					continue;
+
 				zones.Add(zone);
 			}
 		}
+
 		return zones.ToList();
+	}
+
+	public List<Player> GetAdjacentPlayers(Vector2Int pos, int range)
+	{
+		List<Zone> zones = GetAdjacentZones(pos);
+		return zones.SelectMany(z=>z.Players).ToList();
 	}
 
 }

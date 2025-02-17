@@ -21,8 +21,8 @@ namespace Server.GameContents
 		public override int TotalAttack { get => Stat.Attack + WeaponDamage; }
 		public override int TotalDefence { get => ArmorDefence; }
 
-		public int CurrentZoneXIndex => Room.GetZone(CellPos).IndexX;
-		public int CurrentZoneYIndex => Room.GetZone(CellPos).IndexY;
+		public int CurrentZoneXIndex => Room.GetZoneByCellPos(CellPos).IndexX;
+		public int CurrentZoneYIndex => Room.GetZoneByCellPos(CellPos).IndexY;
 
 		public Player()
         {

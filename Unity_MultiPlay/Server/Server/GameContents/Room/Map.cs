@@ -170,7 +170,7 @@ public partial class Map
 		if (posInfo.PosY < MinY || posInfo.PosY > MaxY)
 			return false;
 
-		Zone zone = gameObject.Room.GetZone(gameObject.CellPos);
+		Zone zone = gameObject.Room.GetZoneByCellPos(gameObject.CellPos);
 		zone.RemoveObject(gameObject);
 
 		{
@@ -214,8 +214,8 @@ public partial class Map
 		if (type == GameObjectType.Player)
 		{
 			Player player = (Player)gameObject;
-			Zone CurrentZone = player.Room.GetZone(player.CellPos);
-			Zone AfterZone = player.Room.GetZone(dest);
+			Zone CurrentZone = player.Room.GetZoneByCellPos(player.CellPos);
+			Zone AfterZone = player.Room.GetZoneByCellPos(dest);
 			if (CurrentZone != AfterZone)
 			{
 				CurrentZone.RemovePlayer(player);
@@ -225,8 +225,8 @@ public partial class Map
 		else if (type == GameObjectType.Monster)
 		{
 			Monster monster = (Monster)gameObject;
-			Zone CurrentZone = monster.Room.GetZone(monster.CellPos);
-			Zone AfterZone = monster.Room.GetZone(dest);
+			Zone CurrentZone = monster.Room.GetZoneByCellPos(monster.CellPos);
+			Zone AfterZone = monster.Room.GetZoneByCellPos(dest);
 			if (CurrentZone != AfterZone)
 			{
 				CurrentZone.RemoveMonster(monster);
@@ -236,8 +236,8 @@ public partial class Map
 		else if (type == GameObjectType.Projectile)
 		{
 			Projectile projectile = (Projectile)gameObject;
-			Zone CurrentZone = projectile.Room.GetZone(projectile.CellPos);
-			Zone AfterZone = projectile.Room.GetZone(dest);
+			Zone CurrentZone = projectile.Room.GetZoneByCellPos(projectile.CellPos);
+			Zone AfterZone = projectile.Room.GetZoneByCellPos(dest);
 			if (CurrentZone != AfterZone)
 			{
 				CurrentZone.RemoveProjectile(projectile);
