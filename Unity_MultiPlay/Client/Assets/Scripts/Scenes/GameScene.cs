@@ -12,6 +12,10 @@ public class GameScene : BaseScene
 
         SceneType = Define.Scene.Game;
 
+        //temp test
+        WebRequest.SendCreateAccount("donny", "5680");
+
+
         Managers.Map.LoadMap(1);
 
         Screen.SetResolution(640, 480, false);

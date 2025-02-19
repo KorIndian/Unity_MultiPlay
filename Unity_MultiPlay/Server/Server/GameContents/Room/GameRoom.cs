@@ -47,26 +47,32 @@ public partial class GameRoom : JobSerializer
 			}
 		}
 
-		for(int i = 0 ; i< MonsterMaxCount; ++i)
+		for(int i = 0; i< MonsterMaxCount; i++)
 		{
 			Monster monster = ObjectManager.Instance.AddObject<Monster>();
 			monster.InitByTemplatedId(1);
 			EnterGame(monster, true);
-			return;
 		}
+		LogMonsterCount();
+	}
+
+	public void LogMonsterCount()
+	{
+		Console.WriteLine($"Monster Count : {_monsters.Count}");
+		PushAfter(LogMonsterCount, 10000);
 	}
 
 	public void Update()
 	{
 		FlushJobs();
 
-		if (MonsterMaxCount > _monsters.Values.Count)
-		{
-			Monster monster = ObjectManager.Instance.AddObject<Monster>();
-			monster.InitByTemplatedId(1);
-			EnterGame(monster, true);
-			return;
-		}
+		//if (MonsterMaxCount > _monsters.Values.Count)
+		//{
+		//	Monster monster = ObjectManager.Instance.AddObject<Monster>();
+		//	monster.InitByTemplatedId(1);
+		//	EnterGame(monster, true);
+		//	return;
+		//}
 	}
 
 	public Zone GetZoneByIndex(int indexY, int indexX)

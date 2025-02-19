@@ -272,7 +272,7 @@ namespace Server.GameContents
 				_updateJob.Cancel = true;
 				_updateJob = null;
 			}
-
+			GameRoom room = Room;
 			base.OnDead(attacker);
 
 			GameObject Owner = attacker.GetOwner();
@@ -283,9 +283,11 @@ namespace Server.GameContents
 				{
 					Player player = (Player)Owner;
 					DbTransaction.RewardPlayer(player, rewardData, player.Room);
-
 				}
 			}
+			InitByTemplatedId(TemplateId);
+			room.EnterGame(this, true);
+
 		}
 
 		public RewardData GetRandomRewarData()
