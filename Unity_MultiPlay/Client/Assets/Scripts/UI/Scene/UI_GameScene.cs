@@ -9,10 +9,10 @@ public class UI_GameScene : UI_Scene
 	public override void AwakeInit()
 	{
 		base.AwakeInit();
-		InvenUI = GetComponentInChildren<UI_Inventory>();
+		InvenUI = GetComponentInChildren<UI_Inventory>(true);
 		InvenUI.gameObject.SetActive(false);
 
-		StatUI = GetComponentInChildren<UI_Stat>();
+		StatUI = GetComponentInChildren<UI_Stat>(true);
 		StatUI.gameObject.SetActive(false);
 
 	}

@@ -22,7 +22,7 @@ public partial class GameRoom : JobSerializer
 
 	public Map Map { get; private set; } = new Map();
 
-	public int MonsterMaxCount { get; private set; } = 1000;
+	public int MonsterMaxCount { get; private set; } = 500;
 
 	public const int VisionBounds = 7;
 

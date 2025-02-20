@@ -13,7 +13,13 @@ public class GameScene : BaseScene
         SceneType = Define.Scene.Game;
 
         //temp test
-        WebRequest.SendCreateAccount("donny", "5680");
+        //WebRequest.SendCreateAccount("donny", "5680", (res) =>
+        //{
+        //    if(res.CreateOk)
+        //    {
+
+        //    }
+        //});
 
 
         Managers.Map.LoadMap(1);
@@ -23,6 +29,8 @@ public class GameScene : BaseScene
         sceneUI = Managers.UI.ShowSceneUI<UI_GameScene>();//엄밀히 말하면Instantiate에 가깝다.
 
         Managers.Inventory.SetInventoryUI(sceneUI.InvenUI);
+
+        Managers.Network.ConnectToGameServer();
 	}
 
     public override void Clear()

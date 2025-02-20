@@ -13,12 +13,4 @@ public class UI_Scene : UI_Base
 		//가장밑에 오게한다.
 	}
 
-	public virtual void ToggleUI()
-	{
-		if (gameObject.activeSelf)
-			gameObject.SetActive(false);
-		else
-			gameObject.SetActive(true);
-	}
-
 }

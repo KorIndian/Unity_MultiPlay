@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using UnityEngine;
 
-public class UI_Inventory : UI_Scene
+public class UI_Inventory : UI_Base
 {
 	public static int InventoryItemCount { get; private set; } = 54;
 	public List<UI_Inventory_Item> ItemUIs { get; } = new List<UI_Inventory_Item>();

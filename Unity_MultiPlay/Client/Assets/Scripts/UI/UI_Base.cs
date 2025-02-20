@@ -63,4 +63,13 @@ public abstract class UI_Base : MonoBehaviour
 				break;
 		}
 	}
+
+	public virtual void ToggleUI()
+	{
+		if (gameObject.activeSelf)
+			gameObject.SetActive(false);
+		else
+			gameObject.SetActive(true);
+	}
+
 }

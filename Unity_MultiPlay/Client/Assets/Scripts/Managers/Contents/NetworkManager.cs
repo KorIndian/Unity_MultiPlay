@@ -16,14 +16,14 @@ public class NetworkManager : IDisposable
 		_session.Send(packet);
 	}
 
-	public void Init()
+	public void ConnectToGameServer()
 	{
         PacketManager.Instance.CustomHandler = (s, m, i) =>
         {
             PacketQueue.Instance.Push(i, m);
 			//패킷이 오면 바로 처리하려고 하는 것이 아니라 패킷큐에 담아 뒀다가 처리하도록.
 			//이렇게 하면 소켓의 워커쓰레드가 아니라 게임쓰레드에서 주기적으로 핸들러가 처리되기 때문에
-			//로직이 동기화되면서 크래쉬위험이 줄어든다. 게임쓰레드가 무거워질 수 있음.
+			//로직이 동기화되면서 크래쉬위험이 줄어든다. 단, 게임쓰레드가 무거워진다.
         };
 		// DNS (Domain Name System)
 		string host = Dns.GetHostName();

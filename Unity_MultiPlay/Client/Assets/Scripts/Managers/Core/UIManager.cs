@@ -14,7 +14,7 @@ public class UIManager
     private Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
     private UI_Scene _sceneUI = null;
 
-	public GameObject Root
+	public GameObject UIRoot
     {
         get
         {
@@ -79,7 +79,7 @@ public class UIManager
 		T sceneUI = Util.GetOrAddComponent<T>(go);
         _sceneUI = sceneUI;
 
-		go.transform.SetParent(Root.transform);
+		go.transform.SetParent(UIRoot.transform);
 
 		return sceneUI;
 	}
@@ -93,7 +93,7 @@ public class UIManager
         T popup = Util.GetOrAddComponent<T>(go);
         _popupStack.Push(popup);
 
-        go.transform.SetParent(Root.transform);
+        go.transform.SetParent(UIRoot.transform);
 
 		return popup;
     }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_Stat : UI_Scene
+public class UI_Stat : UI_Base
 {
 	enum Images
 	{
@@ -29,8 +29,6 @@ public class UI_Stat : UI_Scene
 	{
 		if (bInitialized)
 			return;
-
-		base.AwakeInit();
 
 		Bind<Image>(typeof(Images));
 		Bind<Text>(typeof(Texts));
@@ -96,5 +94,10 @@ public class UI_Stat : UI_Scene
 	{
 		RefreshUI();
 		base.ToggleUI();
+	}
+
+	public void TestLog()
+	{
+		Debug.Log("Click Button");
 	}
 }
