@@ -14,7 +14,7 @@ public class UI_Inventory_Item : UI_Base
 	[SerializeField]
 	private Image itemFrame;
 
-	public Item refItem {  get; private set; }
+	public Item refItem { get; private set; }
 
 	public int? ItemDbId => refItem?.itemDbId;
 	public int? TemplateId => refItem?.TemplateId;

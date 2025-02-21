@@ -35,9 +35,12 @@ public class UI_LoginWindow : UI_Base
 				Managers.Network.SetLoginAccountName(res.AccountName);
 				Managers.Network.SetLoginToken(res.Token);
 
-				Managers.Network.ConnectToGameServer();
-				SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
-				//TODO
+				if (Managers.UI.SceneUI is UI_LoginScene loginSceneUI)
+				{
+					loginSceneUI.OpenServerWindow();
+					loginSceneUI.ServerSelectWindow.RefreshServerUI(res.ServerList);
+				}
+
 			}
 			else
 			{

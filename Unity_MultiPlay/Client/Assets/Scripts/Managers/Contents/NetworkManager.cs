@@ -6,6 +6,7 @@ using System.Net;
 using UnityEngine;
 using Google.Protobuf;
 using Google.Protobuf.Protocol;
+using CommonWebPacket;
 
 public class NetworkManager : IDisposable
 {
@@ -29,7 +30,7 @@ public class NetworkManager : IDisposable
 		LoginToken = token;
 	}
 
-	public void ConnectToGameServer()
+	public void ConnectToGameServer(ServerStatus serverStatus)
 	{
         PacketManager.Instance.CustomHandler = (s, m, i) =>
         {
@@ -38,11 +39,9 @@ public class NetworkManager : IDisposable
 			//이렇게 하면 소켓의 워커쓰레드가 아니라 게임쓰레드에서 주기적으로 핸들러가 처리되기 때문에
 			//로직이 동기화되면서 크래쉬위험이 줄어든다. 단, 게임쓰레드가 무거워진다.
         };
-		// DNS (Domain Name System)
-		string host = Dns.GetHostName();
-		IPHostEntry ipHost = Dns.GetHostEntry(host);
-		IPAddress ipAddr = ipHost.AddressList[1];
-		IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
+		
+		IPAddress ipAddr = IPAddress.Parse(serverStatus.IpAddress);
+		IPEndPoint endPoint = new IPEndPoint(ipAddr, serverStatus.Port);
 
 		Connector connector = new Connector();
 

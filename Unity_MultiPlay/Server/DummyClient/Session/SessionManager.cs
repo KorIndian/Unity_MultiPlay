@@ -10,7 +10,7 @@ public class SessionManager
 {
 	public static SessionManager Instance { get; } = new();
 
-	public static int DummyClientCount { get; private set; } = 500;
+	public static int DummyClientCount { get; private set; } = 400;
 
 	HashSet<ServerSession> _sessions = new HashSet<ServerSession>();
 
