@@ -66,13 +66,6 @@ public partial class GameRoom : JobSerializer
 	{
 		FlushJobs();
 
-		//if (MonsterMaxCount > _monsters.Values.Count)
-		//{
-		//	Monster monster = ObjectManager.Instance.AddObject<Monster>();
-		//	monster.InitByTemplatedId(1);
-		//	EnterGame(monster, true);
-		//	return;
-		//}
 	}
 
 	public Zone GetZoneByIndex(int indexY, int indexX)

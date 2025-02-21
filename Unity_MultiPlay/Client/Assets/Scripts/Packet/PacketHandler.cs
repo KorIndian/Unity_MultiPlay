@@ -121,8 +121,10 @@ class PacketHandler
         Debug.Log("S_ConnectedHandler");
         C_LoginRequest LoginRequest = new C_LoginRequest();
 
+        //TODO Login UI에서 입력한 값으로 로그인 리퀘스트 해야함.
         string dataPath = Application.dataPath;//같은 디바이스에서 다수의 플레이어로 실행 할 수 있도록.
         LoginRequest.UniqueId = dataPath.GetHashCode().ToString();
+
 		Managers.Network.Send(LoginRequest);
 
 	}

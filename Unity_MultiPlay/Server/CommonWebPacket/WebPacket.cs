@@ -1,6 +1,9 @@
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 #nullable enable
 
 namespace CommonWebPacket
@@ -67,8 +70,4 @@ namespace CommonWebPacket
 		public int CrowdedLevel { get; set; }
 	}
 }
-
-
-
-
 

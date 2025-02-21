@@ -32,7 +32,8 @@ public class UI_LoginWindow : UI_Base
 		{
 			if (res.LoginOk == true)
 			{
-				SceneManager.LoadSceneAsync("Game",LoadSceneMode.Single);
+				//SceneManager.LoadSceneAsync("Game",LoadSceneMode.Single);
+				//TODO
 			}
 			else
 			{

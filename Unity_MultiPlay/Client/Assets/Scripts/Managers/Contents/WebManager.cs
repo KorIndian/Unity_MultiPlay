@@ -11,7 +11,7 @@ public class WebManager
 
     public void SendPostRequest<T>(string url, object obj, Action<T> callBack)
     {
-        Managers.Instance.StartCoroutine(CoSendWebRequest(url,"POST",obj, callBack));
+        Managers.Instance.StartCoroutine(CoSendWebRequest<T>(url,"POST",obj, callBack));
     }
 
     IEnumerator CoSendWebRequest<T>(string url, string method, object obj, Action<T> callBack)

@@ -3,7 +3,7 @@ using Google.Protobuf.Protocol;
 using ServerCore;
 using System;
 using System.Collections.Generic;
-
+#nullable enable
 #pragma warning disable 8600
 
 class PacketManager
@@ -21,7 +21,7 @@ class PacketManager
 	Dictionary<ushort, Action<PacketSession, ArraySegment<byte>, ushort>> _onRecv = new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>, ushort>>();
 	Dictionary<ushort, Action<PacketSession, IMessage>> _handler = new Dictionary<ushort, Action<PacketSession, IMessage>>();
 	
-	public Action<PacketSession, IMessage, ushort> CustomHandler { get; set; }
+	public Action<PacketSession, IMessage, ushort>? CustomHandler { get; set; }
 
 	public void Register()
 	{		
@@ -63,6 +63,9 @@ class PacketManager
 	{
 		ushort count = 0;
 
+		if (buffer.Array == null)
+			return;
+
 		ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
 		count += 2;
 		ushort id = BitConverter.ToUInt16(buffer.Array, buffer.Offset + count);
@@ -90,7 +93,7 @@ class PacketManager
 		}
 	}
 
-	public Action<PacketSession, IMessage> GetPacketHandler(ushort id)
+	public Action<PacketSession, IMessage>? GetPacketHandler(ushort id)
 	{
 		Action<PacketSession, IMessage> action = null;
 		if (_handler.TryGetValue(id, out action))

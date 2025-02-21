@@ -1,7 +1,11 @@
 ﻿using AccountServer.DB;
+using AccountServer.Http;
+using CommonWebPacket;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace AccountServer.Controllers
 {
@@ -11,6 +15,7 @@ namespace AccountServer.Controllers
 	{
 		AppDbContext context;
 		
+
 		public AccountController(AppDbContext _context)
 		{
 			context = _context;
@@ -46,6 +51,8 @@ namespace AccountServer.Controllers
 			return res;
 		}
 
+		
+
 		[HttpPost]
 		[Route("login")]
 		public LoginAccountPacketRes LoginAccount([FromBody] LoginAccountPacketReq req)
@@ -70,7 +77,11 @@ namespace AccountServer.Controllers
 					new ServerStatus() { Name = "Korea", Ip = "127.0.0.1", CrowdedLevel = 0 },
 					new ServerStatus() { Name = "America", Ip = "127.0.0.1", CrowdedLevel = 3 }
 				};
+				QueryServerStatusReq queryServerStatus = new QueryServerStatusReq() { data = "test" };
+
+				AccountServerHttpClient.HttpSendObject<QueryServerStatusRes>(queryServerStatus, HttpMethod.Post, nameof(QueryServerStatusReq));
 			}
+
 			return res;
 		}
 	}

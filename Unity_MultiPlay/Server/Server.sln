@@ -14,6 +14,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyClient", "DummyClient\DummyClient.csproj", "{2216B82C-D5C5-4544-B9FA-2AE9E6413F3B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountServer", "AccountServer\AccountServer.csproj", "{8C542E48-020E-43B8-961F-D034E21A783A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54CA55AD-5F2F-4479-AB90-30E66290E9C5} = {54CA55AD-5F2F-4479-AB90-30E66290E9C5}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonWebPacket", "CommonWebPacket\CommonWebPacket.csproj", "{54CA55AD-5F2F-4479-AB90-30E66290E9C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +46,10 @@ Global
 		{8C542E48-020E-43B8-961F-D034E21A783A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C542E48-020E-43B8-961F-D034E21A783A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C542E48-020E-43B8-961F-D034E21A783A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54CA55AD-5F2F-4479-AB90-30E66290E9C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54CA55AD-5F2F-4479-AB90-30E66290E9C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54CA55AD-5F2F-4479-AB90-30E66290E9C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54CA55AD-5F2F-4479-AB90-30E66290E9C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
