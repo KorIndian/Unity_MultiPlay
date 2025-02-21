@@ -30,7 +30,6 @@ public class GameScene : BaseScene
 
         Managers.Inventory.SetInventoryUI(sceneUI.InvenUI);
 
-        Managers.Network.ConnectToGameServer();
 	}
 
     public override void Clear()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Server
@@ -9,9 +10,23 @@ namespace Server
 		static SessionManager _session = new SessionManager();
 		public static SessionManager Instance { get { return _session; } }
 
+		//TODO 메인에서 타이머로 실시간 Session카운트를 보면서 Listner한테 listen하고 있을건지 말건지 명령해야함.
+		public const int MaxSessionCount = 500; 
+		public const int CrowdedLevelStride = 100;
+
 		private int _sessionId = 0;
 		Dictionary<int, ClientSession> _sessions = new Dictionary<int, ClientSession>();
 		object _lock = new object();
+
+		public int GetCrowdedLevel()
+		{
+			int CrowdedLevel = 0;
+			lock (_lock)
+			{
+				CrowdedLevel = _sessions.Count / CrowdedLevelStride;
+			}
+			return CrowdedLevel;
+		}
 
 		public List<ClientSession> GetSessions()
 		{
@@ -39,7 +54,7 @@ namespace Server
 			}
 		}
 
-		public ClientSession Find(int id)
+		public ClientSession FindSession(int id)
 		{
 			lock (_lock)
 			{
@@ -49,7 +64,7 @@ namespace Server
 			}
 		}
 
-		public void Remove(ClientSession session)
+		public void RemoveSession(ClientSession session)
 		{
 			lock (_lock)
 			{

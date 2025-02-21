@@ -4,8 +4,11 @@ using CommonWebPacket;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using SharedDB;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using static SharedDB.DataModel;
 
 namespace AccountServer.Controllers
 {
@@ -13,12 +16,14 @@ namespace AccountServer.Controllers
 	[ApiController]
 	public class AccountController : ControllerBase
 	{
-		AppDbContext context;
-		
+		AppDbContext appDbContext;
+		SharedDbContext sharedDbContext;
 
-		public AccountController(AppDbContext _context)
+		//Db가 여러개여도 파라미터를 늘려주면 알아서 인젝션이 된다..
+		public AccountController(AppDbContext _context, SharedDbContext _sharedDbContext)
 		{
-			context = _context;
+			appDbContext = _context;
+			sharedDbContext = _sharedDbContext;
 		}
 
 		[HttpPost]
@@ -27,20 +32,20 @@ namespace AccountServer.Controllers
 		{
 			CreateAccountPacketRes res = new CreateAccountPacketRes();
 
-			AccountDb? account = context.Accounts
+			AccountDb? account = appDbContext.Accounts
 				.AsNoTracking()
 				.Where(a => a.AccountName == req.AccountName)//Name에 인덱싱을 걸어 두었기 때문에 탐색이 빠르다.
 				.FirstOrDefault();
 
-			if(account ==null)
+			if(account == null)
 			{
-				context.Accounts.Add(new AccountDb()
+				appDbContext.Accounts.Add(new AccountDb()
 				{
 					AccountName = req.AccountName,
 					Password = req.Password
 				});
 
-				bool success = context.SaveChangesEx();
+				bool success = appDbContext.SaveChangesEx();
 				res.CreateOk = success;
 			}
 			else
@@ -51,15 +56,13 @@ namespace AccountServer.Controllers
 			return res;
 		}
 
-		
-
 		[HttpPost]
 		[Route("login")]
 		public LoginAccountPacketRes LoginAccount([FromBody] LoginAccountPacketReq req)
 		{
 			LoginAccountPacketRes res = new LoginAccountPacketRes();
 
-			AccountDb? account = context.Accounts
+			AccountDb? account = appDbContext.Accounts
 				.AsNoTracking()
 				.Where(a => a.AccountName == req.AccountName && a.Password == req.Password)
 				.FirstOrDefault();
@@ -71,15 +74,52 @@ namespace AccountServer.Controllers
 			else
 			{
 				res.LoginOk = true;
-				//일단 가라로 만든다.
-				res.ServerList = new List<ServerStatus>()
-				{
-					new ServerStatus() { Name = "Korea", Ip = "127.0.0.1", CrowdedLevel = 0 },
-					new ServerStatus() { Name = "America", Ip = "127.0.0.1", CrowdedLevel = 3 }
-				};
-				QueryServerStatusReq queryServerStatus = new QueryServerStatusReq() { data = "test" };
 
-				AccountServerHttpClient.HttpSendObject<QueryServerStatusRes>(queryServerStatus, HttpMethod.Post, nameof(QueryServerStatusReq));
+				//토큰 발급
+				DateTime expired = DateTime.UtcNow;
+				expired.AddSeconds(600);
+
+				TokenDb? tokenDb = sharedDbContext.Tokens
+					.Where(t =>t.AccountDbId == account.AccountDbId)
+					.FirstOrDefault();
+
+				if(tokenDb != null)
+				{
+					tokenDb.Token = new Random().Next(int.MinValue, int.MaxValue);
+					tokenDb.Expired = expired;
+					sharedDbContext.SaveChangesEx();
+				}
+				else
+				{
+					tokenDb = new TokenDb()
+					{
+						AccountDbId = account.AccountDbId,
+						AccountName = account.AccountName,
+						Token = new Random().Next(int.MinValue, int.MaxValue),
+						Expired = expired
+					};
+					sharedDbContext.Add(tokenDb);
+					sharedDbContext.SaveChangesEx();
+				}
+
+				res.AccountName = account.AccountName;
+				res.AccountId = account.AccountDbId;
+				res.Token = tokenDb.Token;
+
+				foreach (var serverInfo in sharedDbContext.Servers)
+				{
+					res.ServerList.Add(new ServerStatus() 
+					{ 
+						Name = serverInfo.Name,
+						IpAddress = serverInfo.IpAddress,
+						Port = serverInfo.Port,
+						CrowdedLevel = serverInfo.CrowdedLevel
+					});
+				}
+
+				//Test Query
+				//QueryServerStatusReq queryServerStatus = new QueryServerStatusReq() { data = "test" };
+				//AccountServerHttpClient.HttpSendObject<QueryServerStatusRes>(queryServerStatus, HttpMethod.Post, nameof(QueryServerStatusReq));
 			}
 
 			return res;

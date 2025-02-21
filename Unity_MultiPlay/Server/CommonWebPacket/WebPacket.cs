@@ -27,20 +27,20 @@ namespace CommonWebPacket
 	public class QueryServerStatusReq : WebPacket
 	{
 		public ushort PacketId { get; set; } = (ushort)WebPacketID.QueryServerStatusReq;
-		public string? data { get; set; }
+		public string data { get; set; } = string.Empty;
 	}
 
 	public class QueryServerStatusRes : WebPacket
 	{
 		public ushort PacketId { get; set; } = (ushort)WebPacketID.QueryServerStatusRes;
-		public string? data { get; set; }
+		public string data { get; set; } = string.Empty;
 	}
 
 	public class CreateAccountPacketReq : WebPacket
 	{
 		public ushort PacketId { get; set; } = (ushort)WebPacketID.CreateAccountPacketReq;
-		public string? AccountName { get; set; }
-		public string? Password { get; set; }
+		public string AccountName { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
 	}
 
 	public class CreateAccountPacketRes : WebPacket
@@ -52,21 +52,26 @@ namespace CommonWebPacket
 	public class LoginAccountPacketReq : WebPacket
 	{
 		public ushort PacketId { get; set; } = (ushort)WebPacketID.LoginAccountPacketReq;
-		public string? AccountName { get; set; }
-		public string? Password { get; set; }
+		public string AccountName { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
 	}
 
 	public class LoginAccountPacketRes : WebPacket
 	{
 		public ushort PacketId { get; set; } = (ushort)WebPacketID.LoginAccountPacketRes;
+		
 		public bool LoginOk { get; set; }
+		public int AccountId { get; set; }
+		public string AccountName { get; set;} = string.Empty;
+		public int Token { get; set; }
 		public List<ServerStatus> ServerList { get; set; } = new List<ServerStatus>();
 	}
 
 	public class ServerStatus
 	{
-		public string? Name { get; set; }
-		public string? Ip { get; set; }
+		public string Name { get; set; } = string.Empty;
+		public string IpAddress { get; set; } = string.Empty;
+		public int Port { get; set; }
 		public int CrowdedLevel { get; set; }
 	}
 }

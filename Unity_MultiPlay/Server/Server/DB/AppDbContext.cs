@@ -28,7 +28,7 @@ namespace Server.DB
 			builder.AddConsole();
 		});
 
-		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)//일반 콘솔 어플리케이션 configuring 방식 
 		{
 			string connectStr = ConfigManager.Config == null ?  ConnectionString : ConfigManager.Config.connectionString;
 

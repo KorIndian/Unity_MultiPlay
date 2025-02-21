@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonWebPacket\CommonWebPacket.csproj" />
+    <ProjectReference Include="..\CommonWebPacket\CommonWebProtocol.csproj" />
+    <ProjectReference Include="..\SharedDB\SharedDB.csproj" />
   </ItemGroup>
 
 </Project>

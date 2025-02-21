@@ -75,7 +75,7 @@ class PacketManager
 		}
 	}
 
-	public Action<PacketSession, IMessage> GetPacketHandler(ushort id)
+	public Action<PacketSession, IMessage>? GetPacketHandler(ushort id)
 	{
 		Action<PacketSession, IMessage> action = null;
 		if (_handler.TryGetValue(id, out action))

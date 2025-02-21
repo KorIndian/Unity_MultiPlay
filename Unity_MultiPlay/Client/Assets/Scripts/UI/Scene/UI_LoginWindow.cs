@@ -32,7 +32,11 @@ public class UI_LoginWindow : UI_Base
 		{
 			if (res.LoginOk == true)
 			{
-				//SceneManager.LoadSceneAsync("Game",LoadSceneMode.Single);
+				Managers.Network.SetLoginAccountName(res.AccountName);
+				Managers.Network.SetLoginToken(res.Token);
+
+				Managers.Network.ConnectToGameServer();
+				SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
 				//TODO
 			}
 			else

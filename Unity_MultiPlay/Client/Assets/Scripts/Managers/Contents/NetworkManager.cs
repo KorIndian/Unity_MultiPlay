@@ -11,9 +11,22 @@ public class NetworkManager : IDisposable
 {
 	ServerSession _session = new ServerSession();
 
+	public string AccountName { get; private set; } = string.Empty;
+	public int LoginToken { get; private set; }
+
 	public void Send(IMessage packet)
 	{
 		_session.Send(packet);
+	}
+
+	public void SetLoginAccountName(string accountName)
+	{
+		AccountName = accountName;
+	}
+
+	public void SetLoginToken(int token)
+	{
+		LoginToken = token;
 	}
 
 	public void ConnectToGameServer()
@@ -28,7 +41,7 @@ public class NetworkManager : IDisposable
 		// DNS (Domain Name System)
 		string host = Dns.GetHostName();
 		IPHostEntry ipHost = Dns.GetHostEntry(host);
-		IPAddress ipAddr = ipHost.AddressList[0];
+		IPAddress ipAddr = ipHost.AddressList[1];
 		IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
 		Connector connector = new Connector();

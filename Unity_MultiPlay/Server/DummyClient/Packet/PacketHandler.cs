@@ -62,7 +62,7 @@ class PacketHandler
 		C_LoginRequest LoginRequest = new C_LoginRequest();
 
 		ServerSession serverSession = (ServerSession)session;
-		LoginRequest.UniqueId = $"DummyClient_{serverSession.DummyId}";
+		LoginRequest.AccountName = $"DummyClient_{serverSession.DummyId}";
 		serverSession.Send(LoginRequest);
 	}
 

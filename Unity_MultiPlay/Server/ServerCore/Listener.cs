@@ -22,7 +22,7 @@ namespace ServerCore
 			// 영업 시작
 			// backlog : 최대 대기수
 			_listenSocket.Listen(backlog);
-
+			
 			for (int i = 0; i < register; i++)
 			{
 				SocketAsyncEventArgs args = new SocketAsyncEventArgs();

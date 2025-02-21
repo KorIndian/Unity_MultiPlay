@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CommonWebPacket;
 using Google.Protobuf;
 using Google.Protobuf.Protocol;
 using Google.Protobuf.WellKnownTypes;
@@ -20,7 +21,9 @@ using Server.DB;
 using Server.GameContents;
 using Server.Http;
 using ServerCore;
+using SharedDB;
 using static System.Net.Mime.MediaTypeNames;
+using static SharedDB.DataModel;
 
 namespace Server
 {
@@ -80,39 +83,43 @@ namespace Server
 			}
 		}
 
-		static void HttpProcess(HttpListenerContext context)
+		static void StartServerInfoTask()
 		{
-			try
+			var t = new System.Timers.Timer();
+			t.AutoReset = true;
+			t.Elapsed += new System.Timers.ElapsedEventHandler((sender, eArgs) =>
 			{
-				string receivedtext;
-				using (StreamReader reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
+				using (SharedDbContext shared = new SharedDbContext())
 				{
-					receivedtext = reader.ReadToEnd();
-				}
-
-				string responceText = "Something";
-				using (Stream output = context.Response.OutputStream)
-				{
-					using (StreamWriter writer = new StreamWriter(output) { AutoFlush = true })
+					ServerStatusDb serverStatus = shared.Servers.Where(s => s.Name == Program.ServerName).FirstOrDefault();
+					if(serverStatus != null)
 					{
-						writer.Write(responceText);
+						serverStatus.Name = Program.ServerName;
+						serverStatus.IpAddress = Program.IpAddress;
+						serverStatus.Port = Program.Port;
+						serverStatus.CrowdedLevel = SessionManager.Instance.GetCrowdedLevel();
 					}
+					else
+					{
+						serverStatus = new ServerStatusDb()
+						{
+							Name = Program.ServerName,
+							IpAddress = Program.IpAddress,
+							Port = Program.Port,
+							CrowdedLevel = SessionManager.Instance.GetCrowdedLevel()
+						};
+						shared.Add(serverStatus);
+					}
+					shared.SaveChangesEx();
 				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex);
-			}
+			});
+			t.Interval = 10 * 1000;
+			t.Start();
 		}
 
-		static async void HttpTestClient()
-		{
-			HttpClient client = new HttpClient();
-			HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, "Some URL");
-			httpRequestMessage.Content = new StringContent("Some Json");
-			HttpResponseMessage result = await client.SendAsync(httpRequestMessage);
-
-		}
+		public static string ServerName { get; } = "GameServer1";
+		public static int Port { get; } = 7777;
+		public static string IpAddress { get; set; }
 
 		static void Main(string[] args)
 		{
@@ -125,12 +132,16 @@ namespace Server
 			// DNS (Domain Name System)
 			string host = Dns.GetHostName();
 			IPHostEntry ipHost = Dns.GetHostEntry(host);
-			IPAddress ipAddr = ipHost.AddressList[0];
-			IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
+			IPAddress ipAddr = ipHost.AddressList[1];
+			IPEndPoint endPoint = new IPEndPoint(ipAddr, Port);
+
+			IpAddress = ipAddr.ToString();
 
 			_listener.Init(endPoint, SessionManager.Instance.GenerateClientSession);
 			//↑리스너 init시에 클라이언트에서 접속 요청이 왔을때 세션을 제너레이트해줄 함수를 등록해야한다. 
 			Console.WriteLine("Listening...");
+
+			StartServerInfoTask();
 
 			{//HttpThread 전용 쓰레드 생성.
 				Thread HttpThread = new Thread(HttpServerTask);

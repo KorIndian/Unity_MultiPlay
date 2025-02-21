@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.DB;
 using Server.GameContents;
+using SharedDB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,23 +24,44 @@ namespace Server
 			if (ServerState != PlayerServerState.ServerStateLogin)
 				return;
 
-			LobbyPlayers.Clear();
+			bool bProcessable = false;
+			using (SharedDbContext shared = new SharedDbContext())
+			{
+				var tokenDb = shared.Tokens.Where(t => t.AccountName == loginRequest.AccountName)
+					.FirstOrDefault();
+				if (tokenDb != null)
+				{
+					if (tokenDb.Token == loginRequest.Token)
+					{
+						bProcessable = true;
+					}
+				}
+				else
+					bProcessable = false;
+			}
 
+			if (loginRequest.AccountName.StartsWith("DummyClient_"))
+				bProcessable = true;
+
+			if (bProcessable == false)
+				return;
+
+			LobbyPlayers.Clear();
 			using (AppDbContext db = new AppDbContext())
 			{
-				var FOrDAccount = db.Accounts
-					.Where(a => a.AccountName == loginRequest.UniqueId)
+				var FindAccount = db.Accounts
+					.Where(a => a.AccountName == loginRequest.AccountName)
 					.Include(a => a.Players)
 					.FirstOrDefault();
 
-				if (FOrDAccount != null)
+				if (FindAccount != null)
 				{
 					//AccountDbId 메모리에 기억
-					AccountDbId = FOrDAccount.AccountDbId;
+					AccountDbId = FindAccount.AccountDbId;
 
 					S_LoginResult loginResult = new S_LoginResult() { LoginResult = 1 };
 
-					foreach (PlayerDb playerDb in FOrDAccount.Players)
+					foreach (PlayerDb playerDb in FindAccount.Players)
 					{
 						LobbyPlayerInfo lobbyPlayerInfo = new LobbyPlayerInfo()
 						{
@@ -67,7 +89,7 @@ namespace Server
 				}
 				else //Account가 없는 경우 아얘 새로 만들어준다.
 				{
-					AccountDb newAcc = new AccountDb() { AccountName = loginRequest.UniqueId };
+					AccountDb newAcc = new AccountDb() { AccountName = loginRequest.AccountName };
 					db.Accounts.Add(newAcc);
 					bool success = db.SaveChangesEx();
 					if (success == false)

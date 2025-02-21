@@ -129,7 +129,7 @@ namespace Server
 				room.PushJob(room.LeaveGame, MyPlayer.Info.ObjectId);
 			});
 			
-			SessionManager.Instance.Remove(this);
+			SessionManager.Instance.RemoveSession(this);
 		}
 
 		public override void OnSend(int numOfBytes)
